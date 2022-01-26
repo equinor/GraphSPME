@@ -1,0 +1,19 @@
+Package: GraphSPME
+Type: Package
+Title: Graphical Sparse Precision Matrix Estimation
+Version: 0.0.1
+Date: 2022-01-25
+Authors@R: c(person("Berent Ånund Strømnes","Lunde",role=c("aut","cre","cph"),email="lundeberent@gmail.com"))
+Maintainer: Berent Ånund Strømnes Lunde <lundeberent@gmail.com>
+Description: Exposes fast and scalable functions for sparse precision 
+    matrix estimation using the method of (Lunde B. (2022) <doi:??>).
+    The package employs 'Eigen' (C++ templated matrix-vector library)
+    for fast computations. It relies on 'RcppEigen' for easy access 
+    to 'Eigen' and bindings to R.
+License: GPL (>= 2)
+URL: https://github.com/blunde1/GraphSPME
+BugReports: https://github.com/blunde1/GraphSPME/issues
+Encoding: UTF-8
+Imports: Rcpp (>= 1.0.2)
+LinkingTo: Rcpp, RcppEigen
+RoxygenNote: 7.1.2
