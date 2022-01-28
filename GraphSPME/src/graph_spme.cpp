@@ -116,7 +116,7 @@ Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> cov_shrink_spd(
     
     // Modify covariance estimate
     double lambda_hat= lambda_hat_D;
-    auto target_diagonal = S.diagonal();
+    Dmat target_diagonal = S.diagonal();
     S *= (1.0-lambda_hat);
     S.diagonal() += lambda_hat * target_diagonal;
     return S;
