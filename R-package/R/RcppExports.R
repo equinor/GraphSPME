@@ -2,10 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 .cov_shrink_spd <- function(x) {
-    .Call(`_GraphSPME_cov_shrink_spd`, x)
+    .Call(`_GraphSPME__cov_shrink_spd`, x)
+}
+
+.sparse_matrix_inverse <- function(A) {
+    .Call(`_GraphSPME__sparse_matrix_inverse`, A)
 }
 
 .prec_sparse <- function(x, Z, cov_shrinkage = TRUE) {
-    .Call(`_GraphSPME_prec_sparse`, x, Z, cov_shrinkage)
+    .Call(`_GraphSPME__prec_sparse`, x, Z, cov_shrinkage)
 }
 
