@@ -1,21 +1,13 @@
 // Main functions for GraphSPME
 // License: GPL-3
+#include <Eigen/Dense>
+#include <Eigen/Sparse>
 
-//#include "graph_spme.hpp"
-
-
-#include <RcppEigen.h>
-
-// Enable C++11 via this plugin (Rcpp 0.10.3 or later)
-// [[Rcpp::plugins("cpp11")]]
-
-// Enables Eigen
-// // [[Rcpp::depends(RcppEigen)]]
 
 
 using Dmat = Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>;
 using SpdMat = Eigen::SparseMatrix<double>;
-using SpdMatMap = Eigen::MappedSparseMatrix<double>;
+// using SpdMatMap = Eigen::MappedSparseMatrix<double>;
 using dTriplet = Eigen::Triplet<double>;
 
 
@@ -61,7 +53,6 @@ Dmat cov_ml(Dmat& x){
 /*
  * Covariance shrinkage estimate as specified in Touloumis (2015)
  */
-// [[Rcpp::export(.cov_shrink_spd)]]
 Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> cov_shrink_spd(
         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x
     ){
@@ -142,7 +133,6 @@ Dmat sparse_matrix_inverse(SpdMat& A){
  * as defined in Le (2021)
  * and possibilities of using covariance shrinkage from Lunde etal (2022?)
  */
-// [[Rcpp::export(.prec_sparse)]]
 Eigen::SparseMatrix<double> prec_sparse(
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x,
     Eigen::SparseMatrix<double>& Z,
