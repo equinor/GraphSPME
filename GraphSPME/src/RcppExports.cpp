@@ -11,24 +11,35 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// cov_ml
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_ml(const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& x);
+RcppExport SEXP _GraphSPME_cov_ml(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(cov_ml(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cov_shrink_spd
-Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> cov_shrink_spd(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x);
+Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& x);
 RcppExport SEXP _GraphSPME_cov_shrink_spd(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(cov_shrink_spd(x));
     return rcpp_result_gen;
 END_RCPP
 }
 // prec_sparse
-Eigen::SparseMatrix<double> prec_sparse(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x, Eigen::SparseMatrix<double>& Z, bool cov_shrinkage);
+Eigen::SparseMatrix<double> prec_sparse(Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& x, Eigen::SparseMatrix<double>& Z, bool cov_shrinkage);
 RcppExport SEXP _GraphSPME_prec_sparse(SEXP xSEXP, SEXP ZSEXP, SEXP cov_shrinkageSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& >::type x(xSEXP);
     Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type Z(ZSEXP);
     Rcpp::traits::input_parameter< bool >::type cov_shrinkage(cov_shrinkageSEXP);
     rcpp_result_gen = Rcpp::wrap(prec_sparse(x, Z, cov_shrinkage));
@@ -37,6 +48,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_GraphSPME_cov_ml", (DL_FUNC) &_GraphSPME_cov_ml, 1},
     {"_GraphSPME_cov_shrink_spd", (DL_FUNC) &_GraphSPME_cov_shrink_spd, 1},
     {"_GraphSPME_prec_sparse", (DL_FUNC) &_GraphSPME_prec_sparse, 3},
     {NULL, NULL, 0}

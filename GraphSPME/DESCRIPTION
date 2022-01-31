@@ -17,3 +17,6 @@ Encoding: UTF-8
 Imports: Rcpp (>= 1.0.2)
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
