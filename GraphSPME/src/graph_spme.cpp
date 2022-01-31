@@ -32,16 +32,16 @@ Eigen::SparseMatrix<double> create_bi(
     ){
     int p = Z.cols();
     // Iterate to find non-zero elements of Z[,i]
-    SpdMat::InnerIterator it(Z,j);
-    int first_row = it.row();
-    int si = it.value();
-    for(++it; it; ++it) {
+    int si = 0;
+    std::vector<int> row_values;
+    for(SpdMat::InnerIterator it(Z,j); it; ++it) {
         si += it.value();
+        row_values.push_back(it.row());
     }
     // Use triplets to initialize block I_si at start
     std::vector<dTriplet> sparse_mat_triplet(si);
     for(int i=0; i<si; i++){
-        sparse_mat_triplet[i] = dTriplet(first_row+i,i,1.0);
+        sparse_mat_triplet[i] = dTriplet(row_values[i],i,1.0);
     }
     SpdMat Bi(p,si);
     Bi.setFromTriplets(sparse_mat_triplet.begin(), sparse_mat_triplet.end());
