@@ -1,4 +1,5 @@
 import os
+import sysconfig
 from glob import glob
 from setuptools import setup
 
@@ -11,8 +12,12 @@ ext_modules = [
         "graph_spme",
         sorted(glob("src/*.cpp")),
         cxx_std=14,
-        include_dirs=[os.path.join(os.path.dirname(__file__),"../include/graph_spme")],
-        # Example: passing in the version to the compiled code
+        include_dirs=[
+            os.path.join(os.path.dirname(__file__), "../include/graph_spme"),
+            "/usr/include/eigen3",
+            "/usr/local/include/eigen3",
+            "../eigen",
+        ],
         define_macros=[("VERSION_INFO", __version__)],
     ),
 ]
