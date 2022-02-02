@@ -24,7 +24,7 @@ See [dependencies](#dependencies) for details.
 
 ## Example code and documentation
 
-See [GraphSPME-examples](graphspme-examples) for R and Python example code.
+See [GraphSPME-examples](GraphSPME-examples) for R and Python example code.
 
 We use the AR1 process as an example, as it has known covariance, precision, and graphical structure.
 Simulate a zero-mean AR1 process with a known graphical structure:
