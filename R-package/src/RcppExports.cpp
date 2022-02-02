@@ -46,11 +46,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _cov_ml
+Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _cov_ml(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x);
+RcppExport SEXP _GraphSPME__cov_ml(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(_cov_ml(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__cov_shrink_spd", (DL_FUNC) &_GraphSPME__cov_shrink_spd, 1},
     {"_GraphSPME__sparse_matrix_inverse", (DL_FUNC) &_GraphSPME__sparse_matrix_inverse, 1},
     {"_GraphSPME__prec_sparse", (DL_FUNC) &_GraphSPME__prec_sparse, 3},
+    {"_GraphSPME__cov_ml", (DL_FUNC) &_GraphSPME__cov_ml, 1},
     {NULL, NULL, 0}
 };
 

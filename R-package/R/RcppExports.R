@@ -13,3 +13,7 @@
     .Call(`_GraphSPME__prec_sparse`, x, Z, cov_shrinkage)
 }
 
+.cov_ml <- function(x) {
+    .Call(`_GraphSPME__cov_ml`, x)
+}
+

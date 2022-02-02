@@ -40,3 +40,8 @@ Eigen::SparseMatrix<double> _prec_sparse(
 ){
     return prec_sparse(x, Z, cov_shrinkage);
 }
+
+// [[Rcpp::export(.cov_ml)]]
+Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _cov_ml(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x){
+    return cov_ml(x);
+}
