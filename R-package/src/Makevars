@@ -6,4 +6,10 @@
 ## enable compilation with C++11 (or even C++14) where available
 #CXX_STD = CXX11
 
-PKG_CPPFLAGS = -I../../include/graph_spme
+all:../inst
+
+../inst:
+	mkdir -p ../inst
+	cp -r ../../include ../inst
+
+PKG_CPPFLAGS =  -I../inst/include/graph_spme -I../include/graph_spme

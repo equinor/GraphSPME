@@ -8,16 +8,25 @@
 - [x] Lightning fast
 - [x] Both Python and R
 
-_Note: Still work in progress. Waiting for Py_
+Available as header-only in C++, as a Python-package, or as an R-package.
 
 ## Installation
 
-**R**: Install the development version from GitHub
-```r
-devtools::install_github("Blunde1/GraphSPME/GraphSPME")
-```
+Soon:
+- [ ] R-package on CRAN
+- [ ] Python-package on PyPi
+
+In the meantime, follow the [developer instructions](#developing) for installing GraphSPME. 
+Note that GraphSPME relies heavily on [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page).
+See [dependencies](#dependencies) for details.
+
+
 
 ## Example code and documentation
+
+See [GraphSPME-examples](graphspme-examples) for R and Python example code.
+
+We use the AR1 process as an example, as it has known covariance, precision, and graphical structure.
 Simulate a zero-mean AR1 process with a known graphical structure:
 ```r
 library(Matrix)
@@ -97,13 +106,35 @@ frobenius_norm(prec_pop-prec_est)
 ```
 
 ## Dependencies
-GraphSPME is built on the linear algebra library [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page)
-and utilizes [Rcpp](https://github.com/RcppCore/Rcpp) for bindings to R.
-Bindings to Python are done via PyBind.
-In particular the sparse matrix class in Eigen is extensively utilized to obtain efficient and scalable result.
+GraphSPME is built on the linear algebra library [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). In particular the sparse matrix class in Eigen is extensively utilized to obtain efficient and scalable result.
+For the R-package, [RcppEigen](https://github.com/RcppCore/Rcpp) is employed for both bindings to R and access to Eigen (no manual installation needed).
+Bindings to [Python](https://pybind11.readthedocs.io/) are done via PyBind, and here Eigen must be installed manually beforehand.
 
 - [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page) Linear algebra
 - [Rcpp](https://github.com/RcppCore/Rcpp) for the R-package
+- [Pybind](https://pybind11.readthedocs.io/) for the Python-package
+
+
+## Developing
+
+Clone the repository
+```
+git clone git@github.com:equinor/GraphSPME.git
+```
+
+To build the R-package, open the `R-package.Rproj` as a project in RStudio. Under `Build` hit `install and restart`.
+To build it manually, do 
+```
+R CMD build R-package
+R CMD install GraphSPME_0.0.1.tar.gz
+```
+
+To build the Python-package, first make sure that Eigen is installed and available in the include path. See the [Eigen getting started documentation](https://eigen.tuxfamily.org/dox/GettingStarted.html) for details.
+Then GraphSPME is installable in editable mode by
+```
+pip install -e ./python-package
+```
+
 
 
 ## Main idea

@@ -92,6 +92,10 @@ rsconnect/
 
 .DS_Store
 
+R-package/inst/include
+
+.python-version
+
 # Using https://github.com/github/gitignore/blob/master/Python.gitignore
 
 # Byte-compiled / optimized / DLL files
