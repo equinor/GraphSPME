@@ -6,6 +6,8 @@
 ## enable compilation with C++11 (or even C++14) where available
 #CXX_STD = CXX11
 
+PKGROOT=../../
+
 all:../inst
 
 ## translating cp -r: https://stackoverflow.com/a/31015007/7456798 
@@ -14,4 +16,4 @@ all:../inst
 	mkdir ../inst
 	robocopy ../../include ../inst /s /e
 
-PKG_CPPFLAGS =  -I../inst/include/graph_spme -I../include/graph_spme
+PKG_CPPFLAGS = -I$(PKGROOT)/include/graph_spme -I../inst/include/graph_spme -I../include/graph_spme
