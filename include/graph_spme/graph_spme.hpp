@@ -120,7 +120,7 @@ Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> cov_shrink_spd(
  */
 Dmat sparse_matrix_inverse(SpdMat& A){
     int p = A.rows();
-    Eigen::ConjugateGradient<Eigen::SparseMatrix<double>> solver;
+    Eigen::ConjugateGradient<Eigen::SparseMatrix<double> > solver;
     solver.compute(A);
     Eigen::SparseMatrix<double> I(p,p);
     I.setIdentity();

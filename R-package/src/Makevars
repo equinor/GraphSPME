@@ -8,10 +8,6 @@
 
 PKGROOT=../../
 
-all:../inst
+PKG_CPPFLAGS = -I$(PKGROOT)/include
 
-../inst:
-	mkdir -p ../inst
-	cp -r $(PKGROOT)/include ../inst
-
-PKG_CPPFLAGS = -I$(PKGROOT)/include/graph_spme -I../inst/include/graph_spme -I../include/graph_spme
+OBJECTS = ./graph_spme.o
