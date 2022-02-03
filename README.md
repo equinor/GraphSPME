@@ -1,4 +1,5 @@
 # GraphSPME
+[![Wheels](https://github.com/equinor/GraphSPME/actions/workflows/wheels.yml/badge.svg)](https://github.com/equinor/GraphSPME/actions/workflows/wheels.yml)
 
 **High dimensional precision matrix estimation with a known graphical structure**
 
