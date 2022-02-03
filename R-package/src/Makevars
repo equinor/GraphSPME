@@ -8,10 +8,7 @@
 
 PKGROOT=../../
 
-all:../inst
-
-../inst:
-	mkdir -p ../inst
-	cp -r $(PKGROOT)/include ../inst
-
+# Flags set generously to allow for RStudio direct development,
+# and also bundling and installing package outside RStudio
+# See Makefile in root
 PKG_CPPFLAGS = -I$(PKGROOT)/include/graph_spme -I../inst/include/graph_spme -I../include/graph_spme
