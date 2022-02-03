@@ -56,6 +56,7 @@ Dmat cov_ml(Dmat& x){
 Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> cov_shrink_spd(
         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x
     ){
+    // Notation tries to follow R repo https://github.com/AnestisTouloumis/ShrinkCovMat
     int n = x.rows();
     int p = x.cols();
     
