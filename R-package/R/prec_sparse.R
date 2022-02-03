@@ -31,6 +31,26 @@
 #' @export
 prec_sparse <- function(x, Z, shrinkage=TRUE){
     # check input
+    error_messages <- c()
+    error_messages_type <- c(
+        "xtype" = "\n Error: x must be a matrix",
+        "dimensions" = "\n Error: ncol(x) must equal both dim(Z)",
+        "sparsity" = "\n Error: Z must be a sparse matrix of type dgCMatrix"        
+    )
+    # check xtype
+    if(!is.matrix(x))
+        error_messages <- c(error_messages, error_messages_type["xtype"])
+    # dimensions
+    if(!all(ncol(x)==dim(Z))){
+        error_messages <- c(error_messages, error_messages_type["dimensions"])
+    }
+    #sparsity type
+    if(!(class(Z) == "dgCMatrix")){
+        error_messages <- c(error_messages, error_messages_type["sparsity"])
+    }
+    # Any error messages?
+    if(length(error_messages)>0)
+        stop(error_messages)
     
     # calculate cov
     return(.prec_sparse(x, Z, shrinkage))
