@@ -1,0 +1,42 @@
+name: Style
+
+on:
+ push:
+   branches:
+     - main
+     - 'version-**'
+ pull_request:
+
+jobs:
+  python-style:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9']
+    defaults:
+      run:
+        working-directory: ./python-package
+
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install -r dev-requirements.txt
+
+    - name: Lint with flake8
+      run: |
+        flake8 src
+
+    - name: Run black
+      run: |
+        black . --check
