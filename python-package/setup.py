@@ -1,7 +1,6 @@
 import os
-import sysconfig
 from glob import glob
-from setuptools import setup
+from setuptools import find_packages, setup
 
 from pybind11.setup_helpers import Pybind11Extension
 
@@ -9,7 +8,7 @@ __version__ = "0.0.1"
 
 ext_modules = [
     Pybind11Extension(
-        "graph_spme",
+        "_graphspme",
         sorted(glob("src/*.cpp")),
         cxx_std=14,
         include_dirs=[
@@ -31,6 +30,9 @@ setup(
     description="High dimensional precision matrix estimation with a known graphical structure",
     long_description="",
     ext_modules=ext_modules,
+    install_requires=["numpy", "scipy"],
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
     extras_require={"test": "pytest"},
     zip_safe=False,
     python_requires=">=3.6",

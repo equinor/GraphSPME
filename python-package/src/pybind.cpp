@@ -8,12 +8,13 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(graph_spme, m) {
+PYBIND11_MODULE(_graphspme, m)
+{
     m.doc() = R"pbdoc(
         GraphSPME
         ---------
 
-        .. currentmodule:: graph_spme
+        .. currentmodule:: _graphspme
 
         .. autosummary::
            :toctree: _generate
@@ -21,8 +22,20 @@ PYBIND11_MODULE(graph_spme, m) {
            prec_sparse
     )pbdoc";
 
-    m.def("prec_sparse", &prec_sparse, R"pbdoc(
+    m.def("_prec_sparse", &prec_sparse, R"pbdoc(
         prec_sparse
+    )pbdoc");
+
+    m.def("_cov_shrink_spd", &cov_shrink_spd, R"pbdoc(
+        cov_shrink_spd
+    )pbdoc");
+
+    m.def("_sparse_matrix_inverse", &sparse_matrix_inverse, R"pbdoc(
+        sparse_matrix_inverse
+    )pbdoc");
+
+    m.def("_cov_ml", &cov_ml, R"pbdoc(
+        cov_ml
     )pbdoc");
 
 #ifdef VERSION_INFO
