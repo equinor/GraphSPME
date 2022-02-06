@@ -17,3 +17,7 @@
     .Call(`_GraphSPME__cov_ml`, x)
 }
 
+.create_bi <- function(Z, j) {
+    .Call(`_GraphSPME__create_bi`, Z, j)
+}
+

@@ -57,12 +57,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _create_bi
+Eigen::SparseMatrix<double> _create_bi(Eigen::SparseMatrix<double>& Z, int j);
+RcppExport SEXP _GraphSPME__create_bi(SEXP ZSEXP, SEXP jSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< int >::type j(jSEXP);
+    rcpp_result_gen = Rcpp::wrap(_create_bi(Z, j));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__cov_shrink_spd", (DL_FUNC) &_GraphSPME__cov_shrink_spd, 1},
     {"_GraphSPME__sparse_matrix_inverse", (DL_FUNC) &_GraphSPME__sparse_matrix_inverse, 1},
     {"_GraphSPME__prec_sparse", (DL_FUNC) &_GraphSPME__prec_sparse, 3},
     {"_GraphSPME__cov_ml", (DL_FUNC) &_GraphSPME__cov_ml, 1},
+    {"_GraphSPME__create_bi", (DL_FUNC) &_GraphSPME__create_bi, 2},
     {NULL, NULL, 0}
 };
 
