@@ -124,10 +124,11 @@ git clone git@github.com:equinor/GraphSPME.git
 ```
 
 To build the R-package, open the `R-package.Rproj` as a project in RStudio. Under `Build` hit `install and restart`.
-To build it manually, do 
+To build it manually, or for CRAN, use the `Makefile` by running
 ```
-R CMD build R-package
-R CMD install GraphSPME_0.0.1.tar.gz
+make Rbuild # to bundle, or 
+make Rinstall # to bundle and install, or
+make Rcheck # to bundle and check if package ready for CRAN
 ```
 
 To build the Python-package, first make sure that Eigen is installed and available in the include path. See the [Eigen getting started documentation](https://eigen.tuxfamily.org/dox/GettingStarted.html) for details.
