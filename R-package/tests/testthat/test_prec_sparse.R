@@ -18,7 +18,7 @@ test_that("R throws an error for wrong sparsity type", {
 })
 
 test_that("R throws an error for wrong data input type", {
-  X_df <- data.frame(x)
+  X_df <- data.frame(X)
   expect_error(
     prec_sparse(X_df, Z_correct_sparsity),
     "X must be a matrix"
