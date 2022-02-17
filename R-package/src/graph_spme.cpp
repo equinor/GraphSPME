@@ -45,3 +45,8 @@ Eigen::SparseMatrix<double> _prec_sparse(
 Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _cov_ml(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x){
     return cov_ml(x);
 }
+
+// [[Rcpp::export(.create_bi)]]
+Eigen::SparseMatrix<double> _create_bi(Eigen::SparseMatrix<double>& Z, int j) {
+    return create_bi(Z, j);
+}

@@ -43,10 +43,10 @@ Eigen::SparseMatrix<double> create_bi(
 /*
  * The maximum likelihood covariance estimate
  */
-Dmat cov_ml(Dmat& x){
+Dmat cov_ml(Dmat& X){
     // Likelihood estimate of covariance
-    Dmat centered = x.rowwise() - x.colwise().mean();
-    Dmat cov = (centered.adjoint() * centered) / double(x.rows() - 1);
+    Dmat centered = X.rowwise() - X.colwise().mean();
+    Dmat cov = (centered.adjoint() * centered) / double(X.rows() - 1);
     return cov;
 }
 
@@ -54,15 +54,15 @@ Dmat cov_ml(Dmat& x){
  * Covariance shrinkage estimate as specified in Touloumis (2015)
  */
 Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> cov_shrink_spd(
-        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X
     ){
-    int n = x.rows();
-    int p = x.cols();
+    int n = X.rows();
+    int p = X.cols();
     
     // Calculate T_1N and T_2N
     // Calculations may be done without calculating S, see appendix C of Touloumis (2015)
     // Choice depends on p and n
-    Dmat centered = x.rowwise() - x.colwise().mean();
+    Dmat centered = X.rowwise() - X.colwise().mean();
     Dmat S = (centered.adjoint() * centered) / double(n-1.0);
     double trS = S.trace();
     double trS2 = S.squaredNorm(); // tr(A*B) = sum_i,j a_ij * b_ij
@@ -71,24 +71,24 @@ Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> cov_shrink_spd(
     double T_2N = (n-1.0)*((n-1.0)*(n-2.0)*trS2 + trS*trS - n*q) / (n*(n-2)*(n-3));
     
     // Calculate T_3N
-    Dmat x_col_sum = x.colwise().sum();
+    Dmat x_col_sum = X.colwise().sum();
     Dmat Sum1(1,p), Sum21(1,p), Sum22(1,p);
     Sum1.setZero(); 
     Sum21.setZero(); 
     Sum22.setZero();
-    Dmat x_square = x.cwiseProduct(x);
-    Dmat x_cube = x_square.cwiseProduct(x);
-    Dmat x_minus_i = x.colwise().sum();
+    Dmat x_square = X.cwiseProduct(X);
+    Dmat x_cube = x_square.cwiseProduct(X);
+    Dmat x_minus_i = X.colwise().sum();
     Dmat x_square_minus_i = x_square.colwise().sum(); // Notation of code for paper
     Dmat x_cube_minus_i = x_cube.colwise().sum(); // Notation of code for paper
     double Y_3N=0.0;
     for(int i=0; i<n; i++){
-        x_minus_i -= x.row(i);
+        x_minus_i -= X.row(i);
         x_square_minus_i -= x_square.row(i);
         x_cube_minus_i -= x_cube.row(i);
-        Sum1 += x.row(i).cwiseProduct(x_minus_i);
+        Sum1 += X.row(i).cwiseProduct(x_minus_i);
         Sum21 += x_cube.row(i).cwiseProduct(x_minus_i);
-        Sum22 += x_cube_minus_i.cwiseProduct(x.row(i));
+        Sum22 += x_cube_minus_i.cwiseProduct(X.row(i));
         Y_3N += x_square_minus_i.cwiseProduct(x_square.row(i)).sum();
     }
     double Y_7N = 2 * (Sum1.cwiseProduct(x_square.colwise().sum()).sum() - (Sum21+Sum22).sum());
@@ -134,12 +134,12 @@ Dmat sparse_matrix_inverse(SpdMat& A){
  * and possibilities of using covariance shrinkage from Lunde etal (2022?)
  */
 Eigen::SparseMatrix<double> prec_sparse(
-    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x,
+    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
     Eigen::SparseMatrix<double>& Z,
     bool cov_shrinkage=true
 ){
-    int n = x.rows();
-    int p = x.cols();
+    int n = X.rows();
+    int p = X.cols();
     int values_set = 0;
     int si;
     SpdMat Ip(p,p), Prec(p,p);
@@ -150,7 +150,7 @@ Eigen::SparseMatrix<double> prec_sparse(
         SpdMat Bi = create_bi(Z,j);
         SpdMat Bi_trans = Bi.transpose();
         si = Bi.cols();
-        Dmat xbi = x * Bi;
+        Dmat xbi = X * Bi;
         Dmat cov_ml_est(si,si);
         if(cov_shrinkage){
             cov_ml_est = cov_shrink_spd(xbi);
