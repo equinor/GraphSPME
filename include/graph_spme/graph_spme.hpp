@@ -23,6 +23,7 @@ Eigen::SparseMatrix<double> get_precision_nonzero(
         Eigen::SparseMatrix<double> Neighbours, 
         int markov_order
     ){
+    // Return identity matri if order zero
     if(markov_order == 0){
         int p = Neighbours.cols();
         std::vector<dTriplet> identity_triplet(p);
@@ -33,9 +34,11 @@ Eigen::SparseMatrix<double> get_precision_nonzero(
         Ip.setFromTriplets(identity_triplet.begin(), identity_triplet.end());
         return Ip;
     }
+    // Propagate the information to neighbours through multiplication
     for(int order=1; order< markov_order; order++){
         Neighbours = Neighbours * Neighbours;
     }
+    // Reset all non-zero values to ones
     for (int k=0; k<Neighbours.outerSize(); ++k)
     {
         for(SpdMat::InnerIterator it(Neighbours,k); it; ++it) {
