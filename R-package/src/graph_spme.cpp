@@ -50,3 +50,8 @@ Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _cov_ml(Eigen::Matrix<double
 Eigen::SparseMatrix<double> _create_bi(Eigen::SparseMatrix<double>& Z, int j) {
     return create_bi(Z, j);
 }
+
+// [[Rcpp::export(.get_precision_nonzero)]]
+Eigen::SparseMatrix<double> _get_precision_nonzero(Eigen::SparseMatrix<double>& Neighbours, int markov_order) {
+    return get_precision_nonzero(Neighbours, markov_order);
+}

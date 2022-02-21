@@ -69,6 +69,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _get_precision_nonzero
+Eigen::SparseMatrix<double> _get_precision_nonzero(Eigen::SparseMatrix<double>& Neighbours, int markov_order);
+RcppExport SEXP _GraphSPME__get_precision_nonzero(SEXP NeighboursSEXP, SEXP markov_orderSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type Neighbours(NeighboursSEXP);
+    Rcpp::traits::input_parameter< int >::type markov_order(markov_orderSEXP);
+    rcpp_result_gen = Rcpp::wrap(_get_precision_nonzero(Neighbours, markov_order));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__cov_shrink_spd", (DL_FUNC) &_GraphSPME__cov_shrink_spd, 1},
@@ -76,6 +88,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__prec_sparse", (DL_FUNC) &_GraphSPME__prec_sparse, 3},
     {"_GraphSPME__cov_ml", (DL_FUNC) &_GraphSPME__cov_ml, 1},
     {"_GraphSPME__create_bi", (DL_FUNC) &_GraphSPME__create_bi, 2},
+    {"_GraphSPME__get_precision_nonzero", (DL_FUNC) &_GraphSPME__get_precision_nonzero, 2},
     {NULL, NULL, 0}
 };
 

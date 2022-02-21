@@ -21,3 +21,7 @@
     .Call(`_GraphSPME__create_bi`, Z, j)
 }
 
+.get_precision_nonzero <- function(Neighbours, markov_order) {
+    .Call(`_GraphSPME__get_precision_nonzero`, Neighbours, markov_order)
+}
+

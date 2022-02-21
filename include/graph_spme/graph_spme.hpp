@@ -12,6 +12,41 @@ using dTriplet = Eigen::Triplet<double>;
 
 
 /*
+ * Returns matrix of non-zero values for precision matrix
+ * for a distribution having a Markov property of order `markov_order` 
+ * 
+ * @param Neighbours Sparse matrix of ones indicating neighbours on a graph
+ * @param markov_order int order of the Markov property
+ * @return sparse matrix with non-zero elements corresponding to the precision
+ */
+Eigen::SparseMatrix<double> get_precision_nonzero(
+        Eigen::SparseMatrix<double> Neighbours, 
+        int markov_order
+    ){
+    if(markov_order == 0){
+        int p = Neighbours.cols();
+        std::vector<dTriplet> identity_triplet(p);
+        for(int i=0; i<p; i++){
+            identity_triplet[i] = dTriplet(i,i,1.0);
+        }
+        SpdMat Ip(p,p);
+        Ip.setFromTriplets(identity_triplet.begin(), identity_triplet.end());
+        return Ip;
+    }
+    for(int order=1; order< markov_order; order++){
+        Neighbours = Neighbours * Neighbours;
+    }
+    for (int k=0; k<Neighbours.outerSize(); ++k)
+    {
+        for(SpdMat::InnerIterator it(Neighbours,k); it; ++it) {
+            it.valueRef() = 1.0;   
+        }
+    }
+    return Neighbours;   
+}
+
+
+/*
  * Returns matrix Bi so that Bi*wi1 = wi, 
  * wi: column i of precision matrix
  * wi1: non-zero elements of wi
