@@ -9,8 +9,8 @@
     .Call(`_GraphSPME__sparse_matrix_inverse`, A)
 }
 
-.prec_sparse <- function(x, Z, cov_shrinkage = TRUE) {
-    .Call(`_GraphSPME__prec_sparse`, x, Z, cov_shrinkage)
+.prec_sparse <- function(x, Neighbours, markov_order = 1L, cov_shrinkage = TRUE) {
+    .Call(`_GraphSPME__prec_sparse`, x, Neighbours, markov_order, cov_shrinkage)
 }
 
 .cov_ml <- function(x) {
@@ -19,5 +19,9 @@
 
 .create_bi <- function(Z, j) {
     .Call(`_GraphSPME__create_bi`, Z, j)
+}
+
+.get_precision_nonzero <- function(Graph, markov_order) {
+    .Call(`_GraphSPME__get_precision_nonzero`, Graph, markov_order)
 }
 

@@ -4,14 +4,20 @@
 \alias{prec_sparse}
 \title{Graphical Sparse Precision Matrix Estimation}
 \usage{
-prec_sparse(x, Z, shrinkage = TRUE)
+prec_sparse(X, Graph, markov_order = 1, shrinkage = TRUE)
 }
 \arguments{
-\item{x}{an \eqn{nxp} matrix with \eqn{n-}observations of a \eqn{p-}vector}
+\item{X}{an \eqn{nxp} matrix with \eqn{n-}observations of a \eqn{p-}vector}
 
-\item{Z}{a sparse matrix indicating non-zero elements of the precision matrix}
+\item{Graph}{a \eqn{pxp} sparse matrix representing a graph with vertices
+corresponding to columns of \code{X} and edges to direct connections
+(neighborhood) between columns of \code{X}}
 
-\item{shrinkage}{if shrinkage should be applied to block-frequentist-covariance see details for more}
+\item{markov_order}{non-negative int representing the markov order of data
+\code{X} wrt \code{Graph}}
+
+\item{shrinkage}{if shrinkage should be applied to
+block-frequentist-covariance see details for more}
 }
 \value{
 Sparse precision matrix that is SPD.
@@ -20,11 +26,22 @@ Sparse precision matrix that is SPD.
 \code{prec_sparse} is the precision matrix estimator in \pkg{GraphSPME}.
 }
 \details{
-The algorithm utilizes the knowledge of the sparsity provided through
-\code{Z}, using the algorithm of Le (2021). If \code{shrinkage=TRUE} then
-the method of Le (2021) is modified by the method in 
+The algorithm utilizes the knowledge of the graph provided through
+\code{Graph} and \code{markov_order} to create sparse matrix \code{Z} indicating the 
+non-zero elements of the precision matrix of \code{X}.
+
+The resulting sparse matrix \code{Z} is then utilized to estimate a sparse 
+precision matrix using the algorithm of Le (2021). 
+
+If \code{shrinkage=TRUE} then
+the method of Le (2021) is modified by the method in
 Lunde (2022) to iteratively employ asymptotic shrinkage when building
 the sparse precision matrix estimator.
+
+Employing shrinkage ensures numerical stability while improving the resulting
+precision/covariance estimate. This is particularly noticeable when the
+problem involves many neighbors for each vertex and/or has a high Markov
+order.
 
 The algorithm should be robust in the face of extremely high dimensions.
 }

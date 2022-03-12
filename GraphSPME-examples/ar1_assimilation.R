@@ -39,7 +39,7 @@ for(psi in psi_values){
                          rep(1,p-1))
     )
     mu_t1_t0 <- colMeans(mu_t1_t0_sample)
-    prec_t1_t0 <- prec_sparse(mu_t1_t0_sample, Z, shrinkage = TRUE)
+    prec_t1_t0 <- prec_sparse(mu_t1_t0_sample, Graph=Z, markov_order = 1, shrinkage = TRUE)
     prec_t1_t0
     nu_t1_t0 <- prec_t1_t0 %*% mu_t1_t0
 
