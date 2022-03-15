@@ -35,10 +35,11 @@ Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _sparse_matrix_inverse(Eigen
 // [[Rcpp::export(.prec_sparse)]]
 Eigen::SparseMatrix<double> _prec_sparse(
         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x,
-        Eigen::SparseMatrix<double>& Z,
+        Eigen::SparseMatrix<double>& Neighbours,
+        int markov_order=1,
         bool cov_shrinkage=true
 ){
-    return prec_sparse(x, Z, cov_shrinkage);
+    return prec_sparse(x, Neighbours, markov_order, cov_shrinkage);
 }
 
 // [[Rcpp::export(.cov_ml)]]
@@ -49,4 +50,9 @@ Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _cov_ml(Eigen::Matrix<double
 // [[Rcpp::export(.create_bi)]]
 Eigen::SparseMatrix<double> _create_bi(Eigen::SparseMatrix<double>& Z, int j) {
     return create_bi(Z, j);
+}
+
+// [[Rcpp::export(.get_precision_nonzero)]]
+Eigen::SparseMatrix<double> _get_precision_nonzero(Eigen::SparseMatrix<double>& Graph, int markov_order) {
+    return get_precision_nonzero(Graph, markov_order);
 }

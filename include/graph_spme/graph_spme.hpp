@@ -12,6 +12,40 @@ using dTriplet = Eigen::Triplet<double>;
 
 
 /*
+ * Returns matrix of non-zero values for precision matrix
+ * for a distribution having a Markov property of order `markov_order` 
+ * 
+ * @param Neighbours Sparse matrix of ones indicating neighbours on a graph
+ * @param markov_order int order of the Markov property
+ * @return sparse matrix with non-zero elements corresponding to the precision
+ */
+Eigen::SparseMatrix<double> get_precision_nonzero(
+        Eigen::SparseMatrix<double> Neighbours, 
+        int markov_order
+    ){
+    // Return identity matri if order zero
+    if(markov_order == 0){
+        int p = Neighbours.rows();
+        Eigen::SparseMatrix<double> I(p,p);
+        I.setIdentity();
+        return I;
+    }
+    // Propagate the information to neighbours through multiplication
+    for(int order=1; order< markov_order; order++){
+        Neighbours = Neighbours * Neighbours;
+    }
+    // Reset all non-zero values to ones
+    for (int k=0; k<Neighbours.outerSize(); ++k)
+    {
+        for(SpdMat::InnerIterator it(Neighbours,k); it; ++it) {
+            it.valueRef() = 1.0;   
+        }
+    }
+    return Neighbours;   
+}
+
+
+/*
  * Returns matrix Bi so that Bi*wi1 = wi, 
  * wi: column i of precision matrix
  * wi1: non-zero elements of wi
@@ -135,7 +169,8 @@ Dmat sparse_matrix_inverse(SpdMat& A){
  */
 Eigen::SparseMatrix<double> prec_sparse(
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
-    Eigen::SparseMatrix<double>& Z,
+    Eigen::SparseMatrix<double>& Graph,
+    int markov_order=1,
     bool cov_shrinkage=true
 ){
     int n = X.rows();
@@ -145,6 +180,7 @@ Eigen::SparseMatrix<double> prec_sparse(
     SpdMat Ip(p,p), Prec(p,p);
     Ip.setIdentity();
     Prec.setZero();
+    Eigen::SparseMatrix<double> Z = get_precision_nonzero(Graph, markov_order);
     std::vector<dTriplet> prec_mat_triplet(Z.nonZeros());
     for(int j=0; j<p; j++){
         SpdMat Bi = create_bi(Z,j);

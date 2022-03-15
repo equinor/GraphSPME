@@ -16,12 +16,13 @@ else:
 
 def prec_sparse(
     x: NDArray,
-    Z: scipy.sparse.csr_matrix,
+    Graph: scipy.sparse.csr_matrix,
+    markov_order: int = 1,
     cov_shrinkage: bool = True,
 ) -> scipy.sparse.csr_matrix:
-    if not scipy.sparse.isspmatrix_csr(Z):
+    if not scipy.sparse.isspmatrix_csr(Graph):
         raise ValueError(
-            "Z matrix is not on csr (Compressed Sparse Row) format. "
+            "Graph matrix is not on csr (Compressed Sparse Row) format. "
             "This is usually solved by adding format='csr' to the"
             "matrix initialization, e.g. identity(n=10, format='csr')"
         )
@@ -30,12 +31,17 @@ def prec_sparse(
             f"x should be a two dimensional matrix, but has shape: {x.shape}"
         )
     _, n = x.shape
-    if Z.shape != (n, n):
+    if Graph.shape != (n, n):
         raise ValueError(
-            "If x has shape (p,n) then Z should have shape (n,n), "
-            f"but got x.shape = {x.shape} and Z.shape = {Z.shape}"
+            "If x has shape (p,n) then Graph should have shape (n,n), "
+            f"but got x.shape = {x.shape} and Graph.shape = {Graph.shape}"
         )
-    return _prec_sparse(x, Z, cov_shrinkage)
+    if not isinstance(markov_order, int) or markov_order < 0:
+        raise ValueError(
+            "markov_order should be a non-negative integer, "
+            f"but got markov_order = {markov_order}"
+        )
+    return _prec_sparse(x, Graph, markov_order, cov_shrinkage)
 
 
 def cov_shrink_spd(x: NDArray) -> NDArray:
