@@ -13,16 +13,17 @@ rar1 <- function(n, psi){
     return(x)
 }
 
+# Some arbitrary forward model
+G <- function(mu_t0, psi){
+    u <- rar1(length(mu_t0), psi)
+    mu_t1 <- mu_t0 + u
+    return(mu_t1)
+}
+
 set.seed(123)
 psi_values <- c(0,0.2,0.8)
 par(mfrow=c(1,3))
 for(psi in psi_values){
-    # Some random forward model
-    G <- function(mu_t0, psi){
-        u <- rar1(length(mu_t0), psi)
-        mu_t1 <- mu_t0 + u
-        return(mu_t1)
-    }
     p <- 100
     n <- 200
     # Sample the prior at t0
