@@ -173,7 +173,6 @@ Eigen::SparseMatrix<double> prec_sparse(
     int markov_order=1,
     bool cov_shrinkage=true
 ){
-    int n = X.rows();
     int p = X.cols();
     int values_set = 0;
     int si;
