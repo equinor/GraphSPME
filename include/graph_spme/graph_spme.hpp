@@ -7,7 +7,6 @@
 
 using Dmat = Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>;
 using SpdMat = Eigen::SparseMatrix<double>;
-// using SpdMatMap = Eigen::MappedSparseMatrix<double>;
 using dTriplet = Eigen::Triplet<double>;
 
 
@@ -23,7 +22,7 @@ Eigen::SparseMatrix<double> get_precision_nonzero(
         Eigen::SparseMatrix<double> Neighbours, 
         int markov_order
     ){
-    // Return identity matri if order zero
+    // Return identity matrix if order zero
     if(markov_order == 0){
         int p = Neighbours.rows();
         Eigen::SparseMatrix<double> I(p,p);
@@ -46,19 +45,21 @@ Eigen::SparseMatrix<double> get_precision_nonzero(
 
 
 /*
- * Returns matrix Bi so that Bi*wi1 = wi, 
- * wi: column i of precision matrix
- * wi1: non-zero elements of wi
- * Z: sparse positional matrix of non-zero elements of precision
- * j: column
+ * Creates matrix Bi so that Bi*wi1 = wi,
+ * where wi is column i of the precision matrix,
+ * and wi1 are non-zero elements of wi.
+ *  
+ * @param Z sparse positional matrix of non-zero elements of precision
+ * @param j column
+ * @return sparse matrix Bi so that Bi*wi1 = wi
  */
 Eigen::SparseMatrix<double> create_bi(
         Eigen::SparseMatrix<double>& Z, 
         int j
     ){
     int p = Z.cols();
-    // Iterate to find non-zero elements of Z[,i]
-    int si = 0;
+    // Iterate to find non-zero elements of Z[,j]
+    double si = 0;
     std::vector<int> row_values;
     for(SpdMat::InnerIterator it(Z,j); it; ++it) {
         si += it.value();
