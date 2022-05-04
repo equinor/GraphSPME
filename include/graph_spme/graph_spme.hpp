@@ -163,6 +163,15 @@ Dmat sparse_matrix_inverse(SpdMat& A){
 }
 
 /*
+ * Ensure symmetry of matrix
+ */
+void ensure_symmetry(SpdMat& A){
+    SpdMat At = A.transpose();
+    A = A + At;
+    A *= 0.5;
+}
+
+/*
  * Graphical sparse precision matrix estimation
  * as defined in Le (2021)
  * and possibilities of using covariance shrinkage from Lunde etal (2022?)
@@ -202,5 +211,6 @@ Eigen::SparseMatrix<double> prec_sparse(
         }
     }
     Prec.setFromTriplets(prec_mat_triplet.begin(), prec_mat_triplet.end());
+    ensure_symmetry(Prec);
     return Prec;
 }
