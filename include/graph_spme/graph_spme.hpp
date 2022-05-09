@@ -23,7 +23,7 @@ Eigen::SparseMatrix<double> get_precision_nonzero(
         Eigen::SparseMatrix<double> Neighbours, 
         int markov_order
     ){
-    // Return identity matri if order zero
+    // Return identity matrix if order zero
     if(markov_order == 0){
         int p = Neighbours.rows();
         Eigen::SparseMatrix<double> I(p,p);
@@ -31,17 +31,18 @@ Eigen::SparseMatrix<double> get_precision_nonzero(
         return I;
     }
     // Propagate the information to neighbours through multiplication
+    Eigen::SparseMatrix<double> G = Neighbours;
     for(int order=1; order< markov_order; order++){
-        Neighbours = Neighbours * Neighbours;
+        G = G * Neighbours;
     }
     // Reset all non-zero values to ones
-    for (int k=0; k<Neighbours.outerSize(); ++k)
+    for (int k=0; k<G.outerSize(); ++k)
     {
-        for(SpdMat::InnerIterator it(Neighbours,k); it; ++it) {
-            it.valueRef() = 1.0;   
+        for(SpdMat::InnerIterator it(G,k); it; ++it) {
+            it.valueRef() = 1.0;
         }
     }
-    return Neighbours;   
+    return G;   
 }
 
 
@@ -245,7 +246,7 @@ double prec_aic(
     int p = Prec.rows();
     int n = X.rows();
     int nz = Prec.nonZeros();
-    double penalty = 0.5*(nz + p) / 2 / n;
+    double penalty = (nz + p) / 2.0 / n;
     // aic
     double aic = nll + penalty ;
     return aic;
