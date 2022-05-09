@@ -25,3 +25,11 @@
     .Call(`_GraphSPME__get_precision_nonzero`, Graph, markov_order)
 }
 
+.prec_nll <- function(X, Prec) {
+    .Call(`_GraphSPME__prec_nll`, X, Prec)
+}
+
+.prec_aic <- function(X, Prec) {
+    .Call(`_GraphSPME__prec_aic`, X, Prec)
+}
+

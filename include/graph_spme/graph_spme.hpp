@@ -214,3 +214,39 @@ Eigen::SparseMatrix<double> prec_sparse(
     ensure_symmetry(Prec);
     return Prec;
 }
+
+/*
+ * Gaussian negative log-likelihood
+ * Relevant part for precision matrix estimation
+ */
+double prec_nll(
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
+        SpdMat& Prec
+){
+    // Sample covariance matrix
+    Dmat S = cov_ml(X);
+    // Log-determinant of precision
+    Eigen::SparseLU<Eigen::SparseMatrix<double> > solver;
+    solver.compute(Prec);
+    double prec_log_det = solver.logAbsDeterminant();
+    // Relevant part of negative Gaussian log-likelihood
+    return 0.5*((S*Prec).trace() - prec_log_det);
+}
+
+/*
+ * AIC with relevant part of Gaussian likelihood
+ */
+double prec_aic(
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
+        SpdMat& Prec
+){
+    double nll = prec_nll(X, Prec);
+    // AIC penalization factor: The number of free parameters in the precision
+    int p = Prec.rows();
+    int n = X.rows();
+    int nz = Prec.nonZeros();
+    double penalty = 0.5*(nz + p) / 2 / n;
+    // aic
+    double aic = nll + penalty ;
+    return aic;
+}
