@@ -56,3 +56,19 @@ Eigen::SparseMatrix<double> _create_bi(Eigen::SparseMatrix<double>& Z, int j) {
 Eigen::SparseMatrix<double> _get_precision_nonzero(Eigen::SparseMatrix<double>& Graph, int markov_order) {
     return get_precision_nonzero(Graph, markov_order);
 }
+
+// [[Rcpp::export(.prec_nll)]]
+double _prec_nll(
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
+        Eigen::SparseMatrix<double>& Prec
+        ) {
+    return prec_nll(X, Prec);
+}
+
+// [[Rcpp::export(.prec_aic)]]
+double _prec_aic(
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
+        Eigen::SparseMatrix<double>& Prec
+) {
+    return prec_aic(X, Prec);
+}

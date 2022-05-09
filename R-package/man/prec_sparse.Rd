@@ -27,11 +27,11 @@ Sparse precision matrix that is SPD.
 }
 \details{
 The algorithm utilizes the knowledge of the graph provided through
-\code{Graph} and \code{markov_order} to create sparse matrix \code{Z} indicating the 
+\code{Graph} and \code{markov_order} to create sparse matrix \code{Z} indicating the
 non-zero elements of the precision matrix of \code{X}.
 
-The resulting sparse matrix \code{Z} is then utilized to estimate a sparse 
-precision matrix using the algorithm of Le (2021). 
+The resulting sparse matrix \code{Z} is then utilized to estimate a sparse
+precision matrix using the algorithm of Le (2021).
 
 If \code{shrinkage=TRUE} then
 the method of Le (2021) is modified by the method in

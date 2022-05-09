@@ -3,7 +3,7 @@ import sys
 import numpy
 import scipy.sparse
 
-from _graphspme import _prec_sparse, _cov_shrink_spd
+from _graphspme import _prec_sparse, _cov_shrink_spd, _prec_nll, _prec_aic
 
 
 if sys.version_info >= (3, 7):
@@ -46,3 +46,11 @@ def prec_sparse(
 
 def cov_shrink_spd(x: NDArray) -> NDArray:
     return _cov_shrink_spd(x)
+
+
+def prec_nll(x: NDArray, Prec: scipy.sparse.csr_matrix) -> float:
+    return _prec_nll(x, Prec)
+
+
+def prec_aic(x: NDArray, Prec: scipy.sparse.csr_matrix) -> float:
+    return _prec_aic(x, Prec)

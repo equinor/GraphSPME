@@ -37,6 +37,14 @@ PYBIND11_MODULE(_graphspme, m)
     m.def("_cov_ml", &cov_ml, R"pbdoc(
         cov_ml
     )pbdoc");
+    
+    m.def("_prec_nll", &prec_nll, R"pbdoc(
+            prec_nll
+    )pbdoc");
+    
+    m.def("_prec_aic", &prec_aic, R"pbdoc(
+            prec_aic
+    )pbdoc");
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

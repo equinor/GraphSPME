@@ -82,6 +82,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _prec_nll
+double _prec_nll(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X, Eigen::SparseMatrix<double>& Prec);
+RcppExport SEXP _GraphSPME__prec_nll(SEXP XSEXP, SEXP PrecSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type Prec(PrecSEXP);
+    rcpp_result_gen = Rcpp::wrap(_prec_nll(X, Prec));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _prec_aic
+double _prec_aic(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X, Eigen::SparseMatrix<double>& Prec);
+RcppExport SEXP _GraphSPME__prec_aic(SEXP XSEXP, SEXP PrecSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type Prec(PrecSEXP);
+    rcpp_result_gen = Rcpp::wrap(_prec_aic(X, Prec));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__cov_shrink_spd", (DL_FUNC) &_GraphSPME__cov_shrink_spd, 1},
@@ -90,6 +114,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__cov_ml", (DL_FUNC) &_GraphSPME__cov_ml, 1},
     {"_GraphSPME__create_bi", (DL_FUNC) &_GraphSPME__create_bi, 2},
     {"_GraphSPME__get_precision_nonzero", (DL_FUNC) &_GraphSPME__get_precision_nonzero, 2},
+    {"_GraphSPME__prec_nll", (DL_FUNC) &_GraphSPME__prec_nll, 2},
+    {"_GraphSPME__prec_aic", (DL_FUNC) &_GraphSPME__prec_aic, 2},
     {NULL, NULL, 0}
 };
 
