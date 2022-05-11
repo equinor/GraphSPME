@@ -41,7 +41,7 @@ for(i in 1:nd){
     # Compute different estimates
     S <- cov(xtr)
     S_shrink <- cov_shrink_spd(xtr)
-    Prec_le <- prec_sparse(xtr, G, shrinkage=F)
+    Prec_le <- prec_sparse(xtr, G, shrinkage=F, symmetrization = F)
     Prec_gspme <- prec_sparse(xtr, G)
     # Evaluate loss for covariance and precision
     fb_cov_s[i] <- fbnorm(Sigma - S)
@@ -128,7 +128,7 @@ for(i in 1:nd){
     # Compute different estimates
     S <- cov(xtr)
     S_shrink <- cov_shrink_spd(xtr)
-    Prec_le <- prec_sparse(xtr, G, shrinkage=F)
+    Prec_le <- prec_sparse(xtr, G, shrinkage=F, symmetrization = F)
     Prec_gspme <- prec_sparse(xtr, G)
     # Evaluate loss for covariance and precision
     fb_cov_s[i] <- fbnorm(Sigma - S)
@@ -222,7 +222,7 @@ for(i in 1:nd){
     # Compute different estimates
     S <- cov(xtr)
     S_shrink <- cov_shrink_spd(xtr)
-    Prec_le <- prec_sparse(xtr, G, shrinkage=F)
+    Prec_le <- prec_sparse(xtr, G, shrinkage=F, symmetrization=F)
     Prec_gspme <- prec_sparse(xtr, G)
     # Evaluate loss for covariance and precision
     fb_cov_s[i] <- fbnorm(Sigma - S)
