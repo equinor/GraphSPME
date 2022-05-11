@@ -180,7 +180,8 @@ Eigen::SparseMatrix<double> prec_sparse(
     Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
     Eigen::SparseMatrix<double>& Graph,
     int markov_order=1,
-    bool cov_shrinkage=true
+    bool cov_shrinkage=true,
+    bool symmetrization=true
 ){
     int p = X.cols();
     int values_set = 0;
@@ -211,6 +212,8 @@ Eigen::SparseMatrix<double> prec_sparse(
         }
     }
     Prec.setFromTriplets(prec_mat_triplet.begin(), prec_mat_triplet.end());
-    ensure_symmetry(Prec);
+    if(symmetrization){
+        ensure_symmetry(Prec);   
+    }
     return Prec;
 }

@@ -9,8 +9,8 @@
     .Call(`_GraphSPME__sparse_matrix_inverse`, A)
 }
 
-.prec_sparse <- function(x, Neighbours, markov_order = 1L, cov_shrinkage = TRUE) {
-    .Call(`_GraphSPME__prec_sparse`, x, Neighbours, markov_order, cov_shrinkage)
+.prec_sparse <- function(x, Neighbours, markov_order = 1L, cov_shrinkage = TRUE, symmetrization = TRUE) {
+    .Call(`_GraphSPME__prec_sparse`, x, Neighbours, markov_order, cov_shrinkage, symmetrization)
 }
 
 .cov_ml <- function(x) {
