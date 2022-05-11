@@ -15,6 +15,8 @@
 #' \code{X} wrt \code{Graph}
 #' @param shrinkage if shrinkage should be applied to
 #' block-frequentist-covariance see details for more
+#' @param symmetrization if symmetry of the precision estimate should be
+#' ensured through symmetry conversion. See details for more
 #'
 #' @details
 #'
@@ -35,6 +37,11 @@
 #' problem involves many neighbors for each vertex and/or has a high Markov
 #' order.
 #'
+#' If \code{symmetrization=TRUE} then the symmetry conversion
+#' \deqn{\hat{\Lambda}=0.5(\tilde{\Lambda}+\tilde{\Lambda}^\top)}{
+#' 0.5(\Lambda+\Lambda^T)}
+#' is returned.
+#'
 #' The algorithm should be robust in the face of extremely high dimensions.
 #'
 #' @return
@@ -45,7 +52,7 @@
 #'
 #' @rdname prec_sparse
 #' @export
-prec_sparse <- function(X, Graph, markov_order = 1, shrinkage = TRUE) {
+prec_sparse <- function(X, Graph, markov_order = 1, shrinkage = TRUE, symmetrization = TRUE) {
   # check xtype
   if (!is.matrix(X)) {
     stop("X must be a matrix")
@@ -66,5 +73,5 @@ prec_sparse <- function(X, Graph, markov_order = 1, shrinkage = TRUE) {
   }
 
   # calculate precision
-  return(.prec_sparse(X, Graph, markov_order, shrinkage))
+  return(.prec_sparse(X, Graph, markov_order, shrinkage, symmetrization))
 }

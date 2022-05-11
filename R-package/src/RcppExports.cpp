@@ -34,8 +34,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // _prec_sparse
-Eigen::SparseMatrix<double> _prec_sparse(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x, Eigen::SparseMatrix<double>& Neighbours, int markov_order, bool cov_shrinkage);
-RcppExport SEXP _GraphSPME__prec_sparse(SEXP xSEXP, SEXP NeighboursSEXP, SEXP markov_orderSEXP, SEXP cov_shrinkageSEXP) {
+Eigen::SparseMatrix<double> _prec_sparse(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x, Eigen::SparseMatrix<double>& Neighbours, int markov_order, bool cov_shrinkage, bool symmetrization);
+RcppExport SEXP _GraphSPME__prec_sparse(SEXP xSEXP, SEXP NeighboursSEXP, SEXP markov_orderSEXP, SEXP cov_shrinkageSEXP, SEXP symmetrizationSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -43,7 +43,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type Neighbours(NeighboursSEXP);
     Rcpp::traits::input_parameter< int >::type markov_order(markov_orderSEXP);
     Rcpp::traits::input_parameter< bool >::type cov_shrinkage(cov_shrinkageSEXP);
-    rcpp_result_gen = Rcpp::wrap(_prec_sparse(x, Neighbours, markov_order, cov_shrinkage));
+    Rcpp::traits::input_parameter< bool >::type symmetrization(symmetrizationSEXP);
+    rcpp_result_gen = Rcpp::wrap(_prec_sparse(x, Neighbours, markov_order, cov_shrinkage, symmetrization));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -110,7 +111,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__cov_shrink_spd", (DL_FUNC) &_GraphSPME__cov_shrink_spd, 1},
     {"_GraphSPME__sparse_matrix_inverse", (DL_FUNC) &_GraphSPME__sparse_matrix_inverse, 1},
-    {"_GraphSPME__prec_sparse", (DL_FUNC) &_GraphSPME__prec_sparse, 4},
+    {"_GraphSPME__prec_sparse", (DL_FUNC) &_GraphSPME__prec_sparse, 5},
     {"_GraphSPME__cov_ml", (DL_FUNC) &_GraphSPME__cov_ml, 1},
     {"_GraphSPME__create_bi", (DL_FUNC) &_GraphSPME__create_bi, 2},
     {"_GraphSPME__get_precision_nonzero", (DL_FUNC) &_GraphSPME__get_precision_nonzero, 2},
