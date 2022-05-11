@@ -13,7 +13,7 @@
 #' @details
 #'
 #' The Gaussian negative log-likelihood given by
-#' 
+#'
 #' \deqn{l(\Lambda) = \frac{1}{2} tr(S\Lambda)-\log|\Lambda| )}{
 #' l(\Lambda) = 0.5(tr(S\Lambda)-\log|\Lambda|)}
 #'
@@ -26,5 +26,5 @@
 #' @rdname prec_nll
 #' @export
 prec_nll <- function(x, Prec) {
-    return(.prec_nll(x, Prec))
+  return(.prec_nll(x, Prec))
 }

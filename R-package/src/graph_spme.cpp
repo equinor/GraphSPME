@@ -37,9 +37,10 @@ Eigen::SparseMatrix<double> _prec_sparse(
         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& x,
         Eigen::SparseMatrix<double>& Neighbours,
         int markov_order=1,
-        bool cov_shrinkage=true
+        bool cov_shrinkage=true,
+        bool symmetrization=true
 ){
-    return prec_sparse(x, Neighbours, markov_order, cov_shrinkage);
+    return prec_sparse(x, Neighbours, markov_order, cov_shrinkage, symmetrization);
 }
 
 // [[Rcpp::export(.cov_ml)]]

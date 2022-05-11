@@ -19,6 +19,7 @@ def prec_sparse(
     Graph: scipy.sparse.csr_matrix,
     markov_order: int = 1,
     cov_shrinkage: bool = True,
+    symmetrization: bool = True,
 ) -> scipy.sparse.csr_matrix:
     if not scipy.sparse.isspmatrix_csr(Graph):
         raise ValueError(
@@ -41,7 +42,7 @@ def prec_sparse(
             "markov_order should be a non-negative integer, "
             f"but got markov_order = {markov_order}"
         )
-    return _prec_sparse(x, Graph, markov_order, cov_shrinkage)
+    return _prec_sparse(x, Graph, markov_order, cov_shrinkage, symmetrization)
 
 
 def cov_shrink_spd(x: NDArray) -> NDArray:

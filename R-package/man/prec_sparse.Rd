@@ -4,7 +4,13 @@
 \alias{prec_sparse}
 \title{Graphical Sparse Precision Matrix Estimation}
 \usage{
-prec_sparse(X, Graph, markov_order = 1, shrinkage = TRUE)
+prec_sparse(
+  X,
+  Graph,
+  markov_order = 1,
+  shrinkage = TRUE,
+  symmetrization = TRUE
+)
 }
 \arguments{
 \item{X}{an \eqn{nxp} matrix with \eqn{n-}observations of a \eqn{p-}vector}
@@ -18,6 +24,9 @@ corresponding to columns of \code{X} and edges to direct connections
 
 \item{shrinkage}{if shrinkage should be applied to
 block-frequentist-covariance see details for more}
+
+\item{symmetrization}{if symmetry of the precision estimate should be
+ensured through symmetry conversion. See details for more}
 }
 \value{
 Sparse precision matrix that is SPD.
@@ -42,6 +51,11 @@ Employing shrinkage ensures numerical stability while improving the resulting
 precision/covariance estimate. This is particularly noticeable when the
 problem involves many neighbors for each vertex and/or has a high Markov
 order.
+
+If \code{symmetrization=TRUE} then the symmetry conversion
+\deqn{\hat{\Lambda}=0.5(\tilde{\Lambda}+\tilde{\Lambda}^\top)}{
+0.5(\Lambda+\Lambda^T)}
+is returned.
 
 The algorithm should be robust in the face of extremely high dimensions.
 }

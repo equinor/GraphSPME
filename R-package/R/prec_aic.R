@@ -13,7 +13,7 @@
 #' @details
 #'
 #' The AIC-penalized Gaussian negative log-likelihood given by
-#' 
+#'
 #' \deqn{AIC(\Lambda) = \frac{1}{2} tr(S\Lambda)-\log|\Lambda| + c )}{
 #' AIC(\Lambda) = 0.5(tr(S\Lambda)-\log|\Lambda|) + c}
 #'
@@ -26,5 +26,5 @@
 #' @rdname prec_aic
 #' @export
 prec_aic <- function(x, Prec) {
-    return(.prec_aic(x, Prec))
+  return(.prec_aic(x, Prec))
 }
