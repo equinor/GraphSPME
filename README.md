@@ -14,9 +14,16 @@ Available as header-only in C++, as a Python-package, or as an R-package.
 
 ## Installation
 
+**Python:**
+
+GraphSPME is available on [PyPI](https://pypi.org/project/GraphSPME/):
+
+`pip install GraphSPME` 
+
+**R:**
+
 Soon:
 - [ ] R-package on CRAN
-- [ ] Python-package on PyPi
 
 In the meantime, follow the [developer instructions](#developing) for installing GraphSPME. 
 Note that GraphSPME relies heavily on [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page).
