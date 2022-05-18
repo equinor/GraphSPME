@@ -1,10 +1,11 @@
 import os
 from glob import glob
 from setuptools import find_packages, setup
+from setuptools_scm import get_version
 
 from pybind11.setup_helpers import Pybind11Extension
 
-__version__ = "0.0.1"
+__version__ = get_version(root=os.path.join(os.path.dirname(__file__), ".."))
 
 ext_modules = [
     Pybind11Extension(
