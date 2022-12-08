@@ -107,6 +107,32 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _ensure_eigenvalue_lower_bound
+Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _ensure_eigenvalue_lower_bound(Eigen::SparseMatrix<double>& A, double eps, bool is_symmetric);
+RcppExport SEXP _GraphSPME__ensure_eigenvalue_lower_bound(SEXP ASEXP, SEXP epsSEXP, SEXP is_symmetricSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< bool >::type is_symmetric(is_symmetricSEXP);
+    rcpp_result_gen = Rcpp::wrap(_ensure_eigenvalue_lower_bound(A, eps, is_symmetric));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _ldl_fbmod
+Eigen::SparseMatrix<double> _ldl_fbmod(Eigen::SparseMatrix<double>& A, double eps, bool is_symmetric);
+RcppExport SEXP _GraphSPME__ldl_fbmod(SEXP ASEXP, SEXP epsSEXP, SEXP is_symmetricSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< bool >::type is_symmetric(is_symmetricSEXP);
+    rcpp_result_gen = Rcpp::wrap(_ldl_fbmod(A, eps, is_symmetric));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__cov_shrink_spd", (DL_FUNC) &_GraphSPME__cov_shrink_spd, 1},
@@ -117,6 +143,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__get_precision_nonzero", (DL_FUNC) &_GraphSPME__get_precision_nonzero, 2},
     {"_GraphSPME__prec_nll", (DL_FUNC) &_GraphSPME__prec_nll, 2},
     {"_GraphSPME__prec_aic", (DL_FUNC) &_GraphSPME__prec_aic, 2},
+    {"_GraphSPME__ensure_eigenvalue_lower_bound", (DL_FUNC) &_GraphSPME__ensure_eigenvalue_lower_bound, 3},
+    {"_GraphSPME__ldl_fbmod", (DL_FUNC) &_GraphSPME__ldl_fbmod, 3},
     {NULL, NULL, 0}
 };
 

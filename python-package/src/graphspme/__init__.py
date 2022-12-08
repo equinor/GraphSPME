@@ -4,6 +4,7 @@ import numpy
 import scipy.sparse
 
 from _graphspme import _prec_sparse, _cov_shrink_spd, _prec_nll, _prec_aic
+from _graphspme import _ldl_fbmod
 
 
 if sys.version_info >= (3, 7):
@@ -20,6 +21,7 @@ def prec_sparse(
     markov_order: int = 1,
     cov_shrinkage: bool = True,
     symmetrization: bool = True,
+    cholmod_adjustment: float = 1e-3,
 ) -> scipy.sparse.csr_matrix:
     if not scipy.sparse.isspmatrix_csr(Graph):
         raise ValueError(
@@ -42,7 +44,10 @@ def prec_sparse(
             "markov_order should be a non-negative integer, "
             f"but got markov_order = {markov_order}"
         )
-    return _prec_sparse(x, Graph, markov_order, cov_shrinkage, symmetrization)
+    prec = _prec_sparse(x, Graph, markov_order, cov_shrinkage, symmetrization)
+    if cholmod_adjustment:
+        prec = _ldl_fbmod(prec, 1e-3, symmetrization)
+    return prec
 
 
 def cov_shrink_spd(x: NDArray) -> NDArray:

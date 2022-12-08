@@ -45,6 +45,10 @@ PYBIND11_MODULE(_graphspme, m)
     m.def("_prec_aic", &prec_aic, R"pbdoc(
             prec_aic
     )pbdoc");
+    
+    m.def("_ldl_fbmod", &ldl_fbmod, R"pbdoc(
+            ldl_fbmod
+    )pbdoc");
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

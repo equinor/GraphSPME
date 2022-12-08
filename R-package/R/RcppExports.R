@@ -33,3 +33,11 @@
     .Call(`_GraphSPME__prec_aic`, X, Prec)
 }
 
+.ensure_eigenvalue_lower_bound <- function(A, eps = 1e-3, is_symmetric = TRUE) {
+    .Call(`_GraphSPME__ensure_eigenvalue_lower_bound`, A, eps, is_symmetric)
+}
+
+.ldl_fbmod <- function(A, eps = 1e-3, is_symmetric = TRUE) {
+    .Call(`_GraphSPME__ldl_fbmod`, A, eps, is_symmetric)
+}
+

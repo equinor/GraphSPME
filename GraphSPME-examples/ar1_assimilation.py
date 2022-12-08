@@ -43,7 +43,7 @@ if __name__ == "__main__":
         diagonals = [[1] * p, [1] * (p - 1), [1] * (p - 1)]
         Z = sparse.diags(diagonals, [0, -1, 1], format="csr")
 
-        prec_t1_t0 = graphspme.prec_sparse(mu_t1_t0_sample, Z, True)
+        prec_t1_t0 = graphspme.prec_sparse(mu_t1_t0_sample, Z)
 
         mu_t1_t0 = mu_t1_t0_sample.mean(axis=0).reshape((p, 1))
         nu_t1_t0 = prec_t1_t0 @ mu_t1_t0

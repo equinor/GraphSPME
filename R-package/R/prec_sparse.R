@@ -16,7 +16,10 @@
 #' @param shrinkage if shrinkage should be applied to
 #' block-frequentist-covariance see details for more
 #' @param symmetrization if symmetry of the precision estimate should be
-#' ensured through symmetry conversion. See details for more
+#' ensured through symmetry conversion. See details for more.
+#' @param cholmod_adjustment at the end of estimation performs the modified 
+#' Cholesky decomposition of Cheng & Higham (1998), using \code{cholmod_adjustment}
+#' as \eqn{\epsilon} as treshold. See details for more.
 #'
 #' @details
 #'
@@ -40,19 +43,66 @@
 #' If \code{symmetrization=TRUE} then the symmetry conversion
 #' \deqn{\hat{\Lambda}=0.5(\tilde{\Lambda}+\tilde{\Lambda}^\top)}{
 #' 0.5(\Lambda+\Lambda^T)}
-#' is returned.
-#'
-#' The algorithm should be robust in the face of extremely high dimensions.
-#'
+#' is returned. Note that symmetrization is always performed before modified Cholesky.
+#' 
+#' If \code{cholmod_adjustment} is numeric with some \eqn{\epsilon} then an 
+#' adjustment of the precision
+#' with block-LDL decomposition
+#' \eqn{\Pi\hat{\Lambda}\Pi^\top=LDL^\top}
+#' (Ashcraft et. al, 1998)
+#' is performed as
+#' \deqn{\hat{\Lambda}=\Pi^\top LD_+L^\top \Pi}
+#' where the block-diagonal D_+ is modified to have 
+#' eigenvalues \eqn{max(\epsilon, \lambda_{i})}.
+#' All computations happen in a sparsity aware manner.
+#' Note that the eigenvalue adjustment of \eqn{D} approximates the result of 
+#' Higham (1988) calculating a nearest SP(S)D matrix in Frobenius norm as 
+#' \eqn{A_{spsd}=0.5(H+U)} of some matrix \eqn{A} where
+#' \eqn{H=0.5(A+A^\top)} is the nearest symmetric matrix and
+#' \eqn{U} is the polar factor in the polar decomposition 
+#' \eqn{H=PU}.
+#' These computations are iteratively employed on the blocks of \eqn{D},
+#' but not directly on the full matrix \eqn{\hat{\Lambda}} due to dense
+#' computations from working with the spectral decomposition.
+#' If the problem is small, the computations may be accessed through
+#' the function \code{.ensure_eigenvalue_lower_bound()}.
+#' 
+#' The algorithm should be robust in the face of extremely high dimensions. 
+#' 
 #' @return
 #' Sparse precision matrix that is SPD.
 #'
 #' @seealso
 #' \code{\link{cov_shrink_spd}}
+#' 
+#' @references
+#' 
+#' Berent Ånund Strømnes Lunde, Feda Curic and Sondre Sortland,
+#' "GraphSPME: Markov Precision Matrix Estimation and Asymptotic Stein-Type Shrinkage", 2022, 
+#' \url{https://arxiv.org/abs/2205.07584}
+#'
+#' Nicholas J. Higham,
+#' "Computing a nearest symmetric positive semidefinite matrix", 1988, 
+#' \url{https://www.sciencedirect.com/science/article/pii/0024379588902236}
+#' 
+#' Sheung Hun Cheng & Nicholas J. Higham
+#' "A modified Cholesky algorithm based on a symmetric indefinite factorization", 1998
+#' \url{https://epubs.siam.org/doi/10.1137/S0895479896302898}
+#' 
+#' C. Ashcraft, R. G. Grimes, and J. G. Lewis
+#' "Accurate symmetric indefinite linear equation solvers", 1998
+#' \url{https://epubs.siam.org/doi/10.1137/S0895479896296921}
 #'
 #' @rdname prec_sparse
 #' @export
-prec_sparse <- function(X, Graph, markov_order = 1, shrinkage = TRUE, symmetrization = TRUE) {
+prec_sparse <- function(
+        X, 
+        Graph, 
+        markov_order = 1, 
+        shrinkage = TRUE, 
+        symmetrization = TRUE, 
+        cholmod_adjustment = 1e-3
+        ) {
   # check xtype
   if (!is.matrix(X)) {
     stop("X must be a matrix")
@@ -73,5 +123,13 @@ prec_sparse <- function(X, Graph, markov_order = 1, shrinkage = TRUE, symmetriza
   }
 
   # calculate precision
-  return(.prec_sparse(X, Graph, markov_order, shrinkage, symmetrization))
+  prec = .prec_sparse(X, Graph, markov_order, shrinkage, symmetrization)
+  
+  # Eigenvalue adjustments
+  if(is.numeric(cholmod_adjustment)){
+      is_symmetric = symmetrization
+      prec <- .ldl_fbmod(prec, cholmod_adjustment, is_symmetric)
+  }
+  
+  return(prec)
 }

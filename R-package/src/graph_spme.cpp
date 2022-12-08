@@ -3,6 +3,7 @@
 
 #include <Rcpp.h>
 #include "graph_spme.hpp"
+//#include<Eigen/SparseQR>	
 
 // Enable C++11 via this plugin (Rcpp 0.10.3 or later)
 // [[Rcpp::plugins("cpp11")]]
@@ -72,4 +73,22 @@ double _prec_aic(
         Eigen::SparseMatrix<double>& Prec
 ) {
     return prec_aic(X, Prec);
+}
+
+// [[Rcpp::export(.ensure_eigenvalue_lower_bound)]]
+Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _ensure_eigenvalue_lower_bound(
+        Eigen::SparseMatrix<double>& A, 
+        double eps=1e-3,
+        bool is_symmetric=true
+){
+    return ensure_eigenvalue_lower_bound(A, eps, is_symmetric);
+}
+
+// [[Rcpp::export(.ldl_fbmod)]]
+Eigen::SparseMatrix<double> _ldl_fbmod(
+        Eigen::SparseMatrix<double>& A, 
+        double eps=1e-3,
+        bool is_symmetric=true
+){
+    return ldl_fbmod(A, eps, is_symmetric);
 }
