@@ -363,6 +363,17 @@ T dmrf(Tmat<double> &X, SpTMat<T> &Prec)
     return nll;
 }
 
+template <class T>
+T dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
+{
+    Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
+    SpTMat<T> Prec = L * L.transpose();
+    Prec = Prec.twistedBy(Perm); // reverse L = chol(P Lambda P.T)
+    T trace_S_Prec = trace_S_Q<T>(X, Prec);
+    T prec_log_det = 2.0 * L.diagonal().array().log().sum();
+    return 0.5 * (trace_S_Prec - prec_log_det);
+}
+
 /*
  * Interface to dmrf with doubles
  */
@@ -373,10 +384,7 @@ double dmrf(Tmat<double> &X, SpTMat<double> &Prec)
 
 double dmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
 {
-    Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
-    SpTMat<double> Prec = L * L.transpose();
-    Prec = Prec.twistedBy(Perm); // reverse L = chol(P Lambda P.T)
-    return dmrf<double>(X, Prec);
+    return dmrfL<double>(X, L, perm_indices);
 }
 
 Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec)
@@ -441,8 +449,6 @@ Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec)
  */
 Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
 {
-    Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
-
     int nz = L.nonZeros();
     int p = L.cols();
 
@@ -472,11 +478,8 @@ Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
     SpTMat<adouble> L_ad(p, p);
     L_ad.setFromTriplets(L_adtriplets.begin(), L_adtriplets.end());
 
-    SpTMat<adouble> Prec = L_ad * L_ad.transpose();
-    Prec = Prec.twistedBy(Perm);
-
     // Compute objective function
-    adouble nll = dmrf<adouble>(X, Prec);
+    adouble nll = dmrfL<adouble>(X, L, perm_indices);
 
     // Compute gradient
     nll.set_gradient(1.0);
