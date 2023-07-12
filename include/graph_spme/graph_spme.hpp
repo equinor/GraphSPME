@@ -352,7 +352,7 @@ Tvec<int> compute_amd_ordering(SpTMat<double> &A)
  * 0.5 * (tr(SQ) - log(det(Q)))
  */
 template <class T>
-T dmrf(Tmat<double> &X, SpTMat<T> &Prec, Tvec<int> perm_indices)
+T _dmrf(Tmat<double> &X, SpTMat<T> &Prec, Tvec<int> perm_indices)
 {
     T trace_S_Prec = trace_S_Q<T>(X, Prec);
     T prec_log_det = preclogdet(Prec, perm_indices);
@@ -361,7 +361,7 @@ T dmrf(Tmat<double> &X, SpTMat<T> &Prec, Tvec<int> perm_indices)
 }
 
 template <class T>
-T dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
+T _dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
 {
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
     SpTMat<T> Prec = L * L.transpose();
@@ -376,12 +376,12 @@ T dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
  */
 double dmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices)
 {
-    return dmrf<double>(X, Prec, perm_indices);
+    return _dmrf<double>(X, Prec, perm_indices);
 }
 
 double dmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
 {
-    return dmrfL<double>(X, L, perm_indices);
+    return _dmrfL<double>(X, L, perm_indices);
 }
 
 Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices)
@@ -425,7 +425,7 @@ Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices
     Prec_ad.setFromTriplets(Prec_adtriplets.begin(), Prec_adtriplets.end());
 
     // Compute objective function
-    adouble nll = dmrf<adouble>(X, Prec_ad, perm_indices);
+    adouble nll = _dmrf<adouble>(X, Prec_ad, perm_indices);
 
     // Compute gradient
     nll.set_gradient(1.0);
@@ -476,7 +476,7 @@ Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
     L_ad.setFromTriplets(L_adtriplets.begin(), L_adtriplets.end());
 
     // Compute objective function
-    adouble nll = dmrfL<adouble>(X, L_ad, perm_indices);
+    adouble nll = _dmrfL<adouble>(X, L_ad, perm_indices);
 
     // Compute gradient
     nll.set_gradient(1.0);

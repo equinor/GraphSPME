@@ -50,6 +50,22 @@ PYBIND11_MODULE(_graphspme, m)
             compute_amd_ordering
     )pbdoc");
 
+    m.def("_dmrf", &dmrf, R"pbdoc(
+        dmrf
+    )pbdoc");
+
+    m.def("_dmrfL", &dmrfL, R"pbdoc(
+        dmrfL
+    )pbdoc");
+
+    m.def("_ddmrf", &ddmrf, R"pbdoc(
+        ddmrf
+    )pbdoc");
+
+    m.def("_ddmrfL", &ddmrfL, R"pbdoc(
+        ddmrfL
+    )pbdoc");
+
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else
