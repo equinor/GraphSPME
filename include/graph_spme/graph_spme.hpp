@@ -311,12 +311,29 @@ T trace_S_Q(Tmat<double> &X, SpTMat<T> &Prec)
 }
 
 template <class T>
-T preclogdet(SpTMat<T> &P)
+SpTMat<T> cholesky_factor(SpTMat<T> &P, Tvec<int> perm_indices)
 {
-    Eigen::SimplicialLLT<SpTMat<T>> cholesky;
+    Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
+    P = P.twistedBy(Perm);
+    Eigen::SimplicialLLT<SpTMat<T>, Eigen::Lower, Eigen::NaturalOrdering<int>> cholesky;
     cholesky.analyzePattern(P);
     cholesky.factorize(P);
-    SpTMat<T> L = cholesky.matrixL();
+    return cholesky.matrixL();
+}
+
+SpTMat<double> cholesky_factor(SpTMat<double> &P, Tvec<int> perm_indices)
+{
+    return cholesky_factor<double>(P, perm_indices);
+}
+
+template <class T>
+T preclogdet(SpTMat<T> &P, Tvec<int> perm_indices)
+{
+    // Eigen::SimplicialLLT<SpTMat<T>> cholesky;
+    // cholesky.analyzePattern(P);
+    // cholesky.factorize(P);
+    // SpTMat<T> L = cholesky.matrixL();
+    SpTMat<T> L = cholesky_factor(P, perm_indices);
     return 2.0 * L.diagonal().array().log().sum();
 }
 
@@ -335,10 +352,10 @@ Tvec<int> compute_amd_ordering(SpTMat<double> &A)
  * 0.5 * (tr(SQ) - log(det(Q)))
  */
 template <class T>
-T dmrf(Tmat<double> &X, SpTMat<T> &Prec)
+T dmrf(Tmat<double> &X, SpTMat<T> &Prec, Tvec<int> perm_indices)
 {
     T trace_S_Prec = trace_S_Q<T>(X, Prec);
-    T prec_log_det = preclogdet(Prec);
+    T prec_log_det = preclogdet(Prec, perm_indices);
     T nll = 0.5 * (trace_S_Prec - prec_log_det);
     return nll;
 }
@@ -348,7 +365,7 @@ T dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
 {
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
     SpTMat<T> Prec = L * L.transpose();
-    Prec = Prec.twistedBy(Perm.transpose()); // reverse L = chol(P Lambda P.T)
+    Prec = Prec.twistedBy(Perm.transpose()); // reverse L = chol(P * Lambda * P.T)
     T trace_S_Prec = trace_S_Q<T>(X, Prec);
     T prec_log_det = 2.0 * L.diagonal().array().log().sum();
     return 0.5 * (trace_S_Prec - prec_log_det);
@@ -357,9 +374,9 @@ T dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
 /*
  * Interface to dmrf with doubles
  */
-double dmrf(Tmat<double> &X, SpTMat<double> &Prec)
+double dmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices)
 {
-    return dmrf<double>(X, Prec);
+    return dmrf<double>(X, Prec, perm_indices);
 }
 
 double dmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
@@ -367,7 +384,7 @@ double dmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
     return dmrfL<double>(X, L, perm_indices);
 }
 
-Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec)
+Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices)
 {
 
     int nz = Prec.nonZeros();
@@ -408,7 +425,7 @@ Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec)
     Prec_ad.setFromTriplets(Prec_adtriplets.begin(), Prec_adtriplets.end());
 
     // Compute objective function
-    adouble nll = dmrf<adouble>(X, Prec_ad);
+    adouble nll = dmrf<adouble>(X, Prec_ad, perm_indices);
 
     // Compute gradient
     nll.set_gradient(1.0);
@@ -484,7 +501,8 @@ double prec_nll(
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &X,
     SpdMat &Prec)
 {
-    return dmrf(X, Prec);
+    Tvec<int> perm_indices = compute_amd_ordering(Prec);
+    return dmrf(X, Prec, perm_indices);
 }
 
 /*
