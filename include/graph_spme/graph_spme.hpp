@@ -311,7 +311,7 @@ T trace_S_Q(Tmat<double> &X, SpTMat<T> &Prec)
 }
 
 template <class T>
-SpTMat<T> cholesky_factor(SpTMat<T> &P, Tvec<int> perm_indices)
+SpTMat<T> _cholesky_factor(SpTMat<T> &P, Tvec<int> perm_indices)
 {
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
     P = P.twistedBy(Perm);
@@ -323,7 +323,7 @@ SpTMat<T> cholesky_factor(SpTMat<T> &P, Tvec<int> perm_indices)
 
 SpTMat<double> cholesky_factor(SpTMat<double> &P, Tvec<int> perm_indices)
 {
-    return cholesky_factor<double>(P, perm_indices);
+    return _cholesky_factor<double>(P, perm_indices);
 }
 
 template <class T>
@@ -333,7 +333,7 @@ T preclogdet(SpTMat<T> &P, Tvec<int> perm_indices)
     // cholesky.analyzePattern(P);
     // cholesky.factorize(P);
     // SpTMat<T> L = cholesky.matrixL();
-    SpTMat<T> L = cholesky_factor(P, perm_indices);
+    SpTMat<T> L = _cholesky_factor(P, perm_indices);
     return 2.0 * L.diagonal().array().log().sum();
 }
 

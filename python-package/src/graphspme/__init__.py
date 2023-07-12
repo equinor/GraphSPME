@@ -9,6 +9,7 @@ from _graphspme import (
     _prec_nll,
     _prec_aic,
     _compute_amd_ordering,
+    _cholesky_factor,
     _dmrf,
     _dmrfL,
     _ddmrf,
@@ -69,6 +70,12 @@ def prec_aic(x: NDArray, Prec: scipy.sparse.csr_matrix) -> float:
 
 def compute_amd_ordering(A: scipy.sparse.csr_matrix) -> NDArray:
     return _compute_amd_ordering(A)
+
+
+def cholesky_factor(
+    A: scipy.sparse.csr_matrix, perm_indices: NDArray
+) -> scipy.sparse.csr_matrix:
+    return _cholesky_factor(A, perm_indices)
 
 
 def dmrf(X: NDArray, Prec: scipy.sparse.csr_matrix, perm_indices: NDArray) -> float:

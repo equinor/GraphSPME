@@ -50,6 +50,10 @@ PYBIND11_MODULE(_graphspme, m)
             compute_amd_ordering
     )pbdoc");
 
+    m.def("_cholesky_factor", &cholesky_factor, R"pbdoc(
+            cholesky_factor
+    )pbdoc");
+
     m.def("_dmrf", &dmrf, R"pbdoc(
         dmrf
     )pbdoc");
