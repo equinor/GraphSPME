@@ -3,7 +3,13 @@ import sys
 import numpy
 import scipy.sparse
 
-from _graphspme import _prec_sparse, _cov_shrink_spd, _prec_nll, _prec_aic
+from _graphspme import (
+    _prec_sparse,
+    _cov_shrink_spd,
+    _prec_nll,
+    _prec_aic,
+    _compute_amd_ordering,
+)
 
 
 if sys.version_info >= (3, 7):
@@ -55,3 +61,7 @@ def prec_nll(x: NDArray, Prec: scipy.sparse.csr_matrix) -> float:
 
 def prec_aic(x: NDArray, Prec: scipy.sparse.csr_matrix) -> float:
     return _prec_aic(x, Prec)
+
+
+def compute_amd_ordering(A: scipy.sparse.csr_matrix) -> NDArray:
+    return _compute_amd_ordering(A)

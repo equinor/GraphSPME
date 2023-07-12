@@ -320,33 +320,13 @@ T preclogdet(SpTMat<T> &P)
     return 2.0 * L.diagonal().array().log().sum();
 }
 
-Tvec<int> computeAMDOrdering(SpTMat<double> &A)
+Tvec<int> compute_amd_ordering(SpTMat<double> &A)
 {
     Eigen::AMDOrdering<int> ordering;
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(A.rows());
     ordering(A, Perm);
-    return Perm.indices();
-}
-
-int sparseCholeskyNonzeroElementsCount(SpTMat<double> &A)
-{
-    Eigen::SimplicialLLT<SpTMat<double>> cholesky;
-    cholesky.analyzePattern(A);
-    cholesky.factorize(A);
-    SpTMat<double> L = cholesky.matrixL();
-    return L.nonZeros();
-}
-
-SpTMat<double> sparseCholeskyGraph(SpTMat<double> &A)
-{
-    Eigen::SimplicialLLT<SpTMat<double>> cholesky;
-    cholesky.analyzePattern(A);
-    cholesky.factorize(A);
-    SpTMat<double> L = cholesky.matrixL();
-    for (int k = 0; k < L.outerSize(); ++k)
-        for (Eigen::SparseMatrix<double>::InnerIterator it(L, k); it; ++it)
-            it.valueRef() = 1.0;
-    return L;
+    Perm = Perm.transpose();
+    return Perm.indices(); // equals the cholesky AMD ordering calling cholesky.permutationP().indices()
 }
 
 /*
@@ -368,7 +348,7 @@ T dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
 {
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
     SpTMat<T> Prec = L * L.transpose();
-    Prec = Prec.twistedBy(Perm); // reverse L = chol(P Lambda P.T)
+    Prec = Prec.twistedBy(Perm.transpose()); // reverse L = chol(P Lambda P.T)
     T trace_S_Prec = trace_S_Q<T>(X, Prec);
     T prec_log_det = 2.0 * L.diagonal().array().log().sum();
     return 0.5 * (trace_S_Prec - prec_log_det);
@@ -479,7 +459,7 @@ Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
     L_ad.setFromTriplets(L_adtriplets.begin(), L_adtriplets.end());
 
     // Compute objective function
-    adouble nll = dmrfL<adouble>(X, L, perm_indices);
+    adouble nll = dmrfL<adouble>(X, L_ad, perm_indices);
 
     // Compute gradient
     nll.set_gradient(1.0);
