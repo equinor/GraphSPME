@@ -8,6 +8,7 @@ from scipy import sparse
 
 matplotlib.use("Qt5Agg")
 
+
 # zero mean AR1
 def rar1(n, psi):
     x = np.empty([n])
@@ -25,7 +26,6 @@ def G(mu_t0, psi):
 
 
 if __name__ == "__main__":
-
     np.random.seed(1)
     n = 200
     p = 100
@@ -59,7 +59,9 @@ if __name__ == "__main__":
         M = np.array([0] * p, ndmin=2)
         M[0, ind] = 1
 
-        nu_t1_t1 = nu_t1_t0 + (np.transpose(M) @ prec_d @ d_middle_t1).reshape((p, 1))
+        nu_t1_t1 = nu_t1_t0 + (np.transpose(M) @ prec_d @ d_middle_t1).reshape(
+            (p, 1)
+        )
         prec_t1_t1 = prec_t1_t0 + np.transpose(M) @ prec_d @ M
         mu_t1_t1 = np.linalg.inv(prec_t1_t1) * nu_t1_t1.reshape((p, 1))
 
