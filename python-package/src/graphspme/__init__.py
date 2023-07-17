@@ -10,6 +10,7 @@ from _graphspme import (
     _prec_aic,
     _compute_amd_ordering,
     _cholesky_factor,
+    _chol_to_precision,
     _dmrf,
     _dmrfL,
     _ddmrf,
@@ -78,6 +79,12 @@ def cholesky_factor(
     return _cholesky_factor(A, perm_indices)
 
 
+def chol_to_precision(
+    L: scipy.sparse.csr_matrix, perm_indices: NDArray
+) -> scipy.sparse.csr_matrix:
+    return _chol_to_precision(L, perm_indices)
+
+
 def dmrf(X: NDArray, Prec: scipy.sparse.csr_matrix, perm_indices: NDArray) -> float:
     return _dmrf(X, Prec, perm_indices)
 
@@ -86,9 +93,19 @@ def dmrfL(X: NDArray, Prec: scipy.sparse.csr_matrix, perm_indices: NDArray) -> f
     return _dmrfL(X, Prec, perm_indices)
 
 
-def ddmrf(X: NDArray, Prec: scipy.sparse.csr_matrix, perm_indices: NDArray) -> NDArray:
-    return _ddmrf(X, Prec, perm_indices)
+def ddmrf(
+    X: NDArray,
+    Prec: scipy.sparse.csr_matrix,
+    perm_indices: NDArray,
+    gradient_scale: float,
+) -> NDArray:
+    return _ddmrf(X, Prec, perm_indices, gradient_scale)
 
 
-def ddmrfL(X: NDArray, Prec: scipy.sparse.csr_matrix, perm_indices: NDArray) -> NDArray:
-    return _ddmrfL(X, Prec, perm_indices)
+def ddmrfL(
+    X: NDArray,
+    Prec: scipy.sparse.csr_matrix,
+    perm_indices: NDArray,
+    gradient_scale: float,
+) -> NDArray:
+    return _ddmrfL(X, Prec, perm_indices, gradient_scale)

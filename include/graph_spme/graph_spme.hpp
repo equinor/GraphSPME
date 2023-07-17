@@ -4,7 +4,7 @@
 #include <Eigen/Sparse>
 
 using Dmat = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
-using SpdMat = Eigen::SparseMatrix<double>;
+using SpdMat = Eigen::SparseMatrix<double, Eigen::ColMajor>;
 // using SpdMatMap = Eigen::MappedSparseMatrix<double>;
 using dTriplet = Eigen::Triplet<double>;
 
@@ -246,7 +246,7 @@ template <class T>
 using Tvec = Eigen::Matrix<T, Eigen::Dynamic, 1>;
 
 template <class T>
-using SpTMat = Eigen::SparseMatrix<T>;
+using SpTMat = Eigen::SparseMatrix<T, Eigen::ColMajor>;
 
 template <class T>
 using TTriplet = Eigen::Triplet<T>;
@@ -277,7 +277,8 @@ std::vector<TTriplet<T>> to_triplets(SpTMat<T> &M)
     std::vector<TTriplet<T>> v;
     for (int i = 0; i < M.outerSize(); i++)
         for (typename SpTMat<T>::InnerIterator it(M, i); it; ++it)
-            v.emplace_back(it.row(), it.col(), it.value());
+            // v.emplace_back(it.row(), it.col(), it.value());
+            v.push_back(TTriplet<T>(it.row(), it.col(), it.value()));
     return v;
 }
 
@@ -310,11 +311,22 @@ T trace_S_Q(Tmat<double> &X, SpTMat<T> &Prec)
     return trace_S_Prec;
 }
 
+/**
+ * Computes the Cholesky factor of a sparse matrix P with given permutation.
+ *
+ * @param P sparse SPD pxp matrix.
+ * @param perm_indices vector of unique int 0<i<p-1 defining permutation of `P`.
+ * @return The lower Cholesky factor L.
+ */
 template <class T>
 SpTMat<T> _cholesky_factor(SpTMat<T> &P, Tvec<int> perm_indices)
 {
+    // Ensure column-major
+    P.makeCompressed();
+    // Permute P
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
     P = P.twistedBy(Perm);
+    // Define cholesky solver to use natural ordering
     Eigen::SimplicialLLT<SpTMat<T>, Eigen::Lower, Eigen::NaturalOrdering<int>> cholesky;
     cholesky.analyzePattern(P);
     cholesky.factorize(P);
@@ -324,6 +336,14 @@ SpTMat<T> _cholesky_factor(SpTMat<T> &P, Tvec<int> perm_indices)
 SpTMat<double> cholesky_factor(SpTMat<double> &P, Tvec<int> perm_indices)
 {
     return _cholesky_factor<double>(P, perm_indices);
+}
+
+SpTMat<double> chol_to_precision(SpTMat<double> &L, Tvec<int> perm_indices)
+{
+    Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
+    SpTMat<double> Prec = L * L.transpose();
+    Prec = Prec.twistedBy(Perm.transpose()); // reverse L = chol(P * Lambda * P.T)
+    return Prec;
 }
 
 template <class T>
@@ -354,6 +374,8 @@ Tvec<int> compute_amd_ordering(SpTMat<double> &A)
 template <class T>
 T _dmrf(Tmat<double> &X, SpTMat<T> &Prec, Tvec<int> perm_indices)
 {
+    // Compress Prec in column-major format
+    Prec.makeCompressed();
     T trace_S_Prec = trace_S_Q<T>(X, Prec);
     T prec_log_det = preclogdet(Prec, perm_indices);
     T nll = 0.5 * (trace_S_Prec - prec_log_det);
@@ -363,6 +385,8 @@ T _dmrf(Tmat<double> &X, SpTMat<T> &Prec, Tvec<int> perm_indices)
 template <class T>
 T _dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
 {
+    // Compress L in column-major format
+    L.makeCompressed();
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
     SpTMat<T> Prec = L * L.transpose();
     Prec = Prec.twistedBy(Perm.transpose()); // reverse L = chol(P * Lambda * P.T)
@@ -384,20 +408,25 @@ double dmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
     return _dmrfL<double>(X, L, perm_indices);
 }
 
-Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices)
+Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices, double gradient_scale)
 {
 
-    int nz = Prec.nonZeros();
-    Prec = Prec.triangularView<Eigen::Lower>();
-    int nparameters = Prec.nonZeros();
-    int p = Prec.cols();
+    // Compress Prec in column-major format
+    Prec.makeCompressed();
+
+    // int nz = Prec.nonZeros();
+    SpTMat<double> Prec_tril = Prec.triangularView<Eigen::Lower>();
+    int nparameters = Prec_tril.nonZeros();
+    // std::cout << "nparameters: " << nparameters << std::endl;
+    int p = Prec_tril.cols();
+    // std::cout << Prec_tril.toDense() << std::endl;
 
     // Start stack
     adept::Stack stack;
 
     // create args-vector to compute gradient for
     adouble args_ad[nparameters];
-    std::vector<TTriplet<double>> Prec_lower_tri_dtriplets = to_triplets<double>(Prec);
+    std::vector<TTriplet<double>> Prec_lower_tri_dtriplets = to_triplets<double>(Prec_tril);
     for (int i = 0; i < nparameters; i++)
     {
         args_ad[i] = Prec_lower_tri_dtriplets[i].value();
@@ -407,18 +436,20 @@ Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices
     stack.new_recording();
 
     // Init ad version of Prec
-    std::vector<TTriplet<adouble>> Prec_adtriplets(nz);
+    std::vector<TTriplet<adouble>> Prec_adtriplets; //(nz);
     TTriplet<double> tri;
     for (int i = 0; i < nparameters; i++)
     {
         tri = Prec_lower_tri_dtriplets[i];
-        Prec_adtriplets[i] = TTriplet<adouble>(
-            tri.row(), tri.col(), args_ad[i]);
+        Prec_adtriplets.push_back(
+            TTriplet<adouble>(
+                tri.row(), tri.col(), args_ad[i]));
         if (tri.row() != tri.col())
         {
             // not diagonal, add symmetric element in prec
-            Prec_adtriplets[i] = TTriplet<adouble>(
-                tri.col(), tri.row(), args_ad[i]);
+            Prec_adtriplets.push_back(
+                TTriplet<adouble>(
+                    tri.col(), tri.row(), args_ad[i]));
         }
     }
     SpTMat<adouble> Prec_ad(p, p);
@@ -428,10 +459,16 @@ Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices
     adouble nll = _dmrf<adouble>(X, Prec_ad, perm_indices);
 
     // Compute gradient
-    nll.set_gradient(1.0);
+    // See Sec. 5.4 of adept docs www.met.reading.ac.uk/clouds/adept/adept_documentation_1.1.pdf
+    nll.set_gradient(gradient_scale);
+
+    // checked nll.value is correct, implies Prec_ad is correct
+    // std::cout << nll.value() << std::endl;
+
     stack.compute_adjoint();
 
     // Extract gradient elements
+    // std::cout << "nparameters: " << nparameters << std::endl;
     Tvec<double> grad(nparameters);
     for (int i = 0; i < nparameters; i++)
     {
@@ -444,8 +481,12 @@ Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices
  * Returns gradient of dmrf w.r.t. vectorized (row-by-row) L
  * L: sparse col-major matrix, left Cholesky factor of precision matrix.
  */
-Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
+Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices, double gradient_scale)
 {
+
+    // Compress L in column-major format
+    L.makeCompressed();
+
     int nz = L.nonZeros();
     int p = L.cols();
 
@@ -479,8 +520,12 @@ Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
     adouble nll = _dmrfL<adouble>(X, L_ad, perm_indices);
 
     // Compute gradient
-    nll.set_gradient(1.0);
+    // See Sec. 5.4 of adept docs www.met.reading.ac.uk/clouds/adept/adept_documentation_1.1.pdf
+    nll.set_gradient(gradient_scale);
     stack.compute_adjoint();
+
+    // checked nll.value is correct, implies Prec_ad is correct
+    // std::cout << nll.value() << std::endl;
 
     // Extract gradient elements
     Tvec<double> grad(nz);

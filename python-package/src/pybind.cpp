@@ -54,6 +54,10 @@ PYBIND11_MODULE(_graphspme, m)
             cholesky_factor
     )pbdoc");
 
+    m.def("_chol_to_precision", &chol_to_precision, R"pbdoc(
+            chol_to_precision
+    )pbdoc");
+
     m.def("_dmrf", &dmrf, R"pbdoc(
         dmrf
     )pbdoc");
