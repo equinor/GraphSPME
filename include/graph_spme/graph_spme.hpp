@@ -267,9 +267,12 @@ namespace adept
     }
 }
 
-/*
- * Custom sparse matrix M to vector or triplets
+/**
+ * @brief Custom sparse matrix M to vector or triplets.
  * https://stackoverflow.com/a/51546701
+ *
+ * @param M sparse T matrix M.
+ * @return std::vector of T triplets
  */
 template <class T>
 std::vector<TTriplet<T>> to_triplets(SpTMat<T> &M)
@@ -282,7 +285,7 @@ std::vector<TTriplet<T>> to_triplets(SpTMat<T> &M)
 }
 
 /**
- * Computes the trace of SQ where S is the normalized scatter matrix from data X.
+ * @brief Computes the trace of SQ where S is the normalized scatter matrix from data X.
  * The evaluation is computation and memory efficient given that:
  * - S is never explicitly calculated (memory efficient)
  * - Only iterates over non-zero elements of Q in trace formula.
@@ -313,7 +316,7 @@ T trace_S_Q(Tmat<double> &X, SpTMat<T> &Prec)
 }
 
 /**
- * Computes the Cholesky factor of a sparse matrix P with given permutation.
+ * @brief Computes the Cholesky factor of a sparse matrix P with given permutation.
  *
  * @param P sparse SPD pxp matrix.
  * @param perm_indices vector of unique int 0<i<p-1 defining permutation of `P`.
@@ -334,16 +337,30 @@ SpTMat<T> _cholesky_factor(SpTMat<T> &P, Tvec<int> perm_indices)
     return cholesky.matrixL();
 }
 
+/**
+ * @brief Interface to `_cholesky_factor<T>` with doubles
+ *
+ * @param P double sparse SPD pxp matrix
+ * @param perm_indices vector of unique int 0<i<p-1 defining permutation of `P`.
+ * @return SpTMat<double> lower cholesky factor L.
+ */
 SpTMat<double> cholesky_factor(SpTMat<double> &P, Tvec<int> perm_indices)
 {
     return _cholesky_factor<double>(P, perm_indices);
 }
 
+/**
+ * @brief Retrieve origin matrix M from cholesky factor and permutation
+ *
+ * @param L the sparse lower triangular cholesky factor of P*M*P.T where P is defined from `perm_indices`
+ * @param perm_indices vector of unique int 0<i<p-1 defining permutation of `P`.
+ * @return SpTMat<double> SPD matrix M = P.T*L*L.T*P
+ */
 SpTMat<double> chol_to_precision(SpTMat<double> &L, Tvec<int> perm_indices)
 {
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
     SpTMat<double> Prec = L * L.transpose();
-    Prec = Prec.twistedBy(Perm.transpose()); // reverse L = chol(P * Lambda * P.T)
+    Prec = Prec.twistedBy(Perm.transpose());
     return Prec;
 }
 
