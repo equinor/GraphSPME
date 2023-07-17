@@ -396,15 +396,18 @@ Tvec<int> compute_amd_ordering(SpTMat<double> &A)
     return Perm.indices(); // equals Cholesky AMD cholesky.permutationP().indices()
 }
 
-/*
- * Relevant part of negative-log density of Markov random field
- * Only relevant part returned:
- * 0.5 * (tr(SQ) - log(det(Q)))
+/**
+ * @brief Negative log-likelihood of GMRF relevant to precision.
+ *
+ * @param X nxp data matrix.
+ * @param Prec pxp spd precision matrix.
+ * @param perm_indices vector of unique int 0<i<p-1 defining AMD permutation of `Prec`.
+ * @return negative log-likelihood.
  */
 template <class T>
 T _dmrf(Tmat<double> &X, SpTMat<T> &Prec, Tvec<int> perm_indices)
 {
-    // Compress Prec in column-major format
+    // Ensure column-major format
     Prec.makeCompressed();
     T trace_S_Prec = trace_S_Q<T>(X, Prec);
     T prec_log_det = logdet_sparse_spd(Prec, perm_indices);
@@ -412,10 +415,18 @@ T _dmrf(Tmat<double> &X, SpTMat<T> &Prec, Tvec<int> perm_indices)
     return nll;
 }
 
+/**
+ * @brief Negative log-likelihood of GMRF relevant to cholesky factor of precision.
+ *
+ * @param X nxp data matrix.
+ * @param L pxp lower-triangular cholesky factor of permuted precision matrix.
+ * @param perm_indices vector of unique int 0<i<p-1 defining AMD for `L`.
+ * @return negative log-likelihood.
+ */
 template <class T>
 T _dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
 {
-    // Compress L in column-major format
+    // Ensure L in column-major format
     L.makeCompressed();
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
     SpTMat<T> Prec = L * L.transpose();
@@ -425,31 +436,54 @@ T _dmrfL(Tmat<double> &X, SpTMat<T> &L, Tvec<int> perm_indices)
     return 0.5 * (trace_S_Prec - prec_log_det);
 }
 
-/*
- * Interface to dmrf with doubles
+/**
+ * @brief Negative log-likelihood of GMRF relevant to precision.
+ * Interface to _dmrf<T> with doubles
+ *
+ * @param X nxp data matrix.
+ * @param Prec pxp spd precision matrix.
+ * @param perm_indices vector of unique int 0<i<p-1 defining AMD permutation of `Prec`.
+ * @return negative log-likelihood.
  */
 double dmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices)
 {
     return _dmrf<double>(X, Prec, perm_indices);
 }
 
+/**
+ * @brief Negative log-likelihood of GMRF relevant to cholesky factor of precision.
+ * Interface to _dmrfL<T> with doubles
+ *
+ * @param X nxp data matrix.
+ * @param L pxp lower-triangular cholesky factor of permuted precision matrix.
+ * @param perm_indices vector of unique int 0<i<p-1 defining AMD for `L`.
+ * @return negative log-likelihood.
+ */
 double dmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices)
 {
     return _dmrfL<double>(X, L, perm_indices);
 }
 
+/**
+ * @brief Gradient of negative log-likelihood of GMRF w.r.t. precision.
+ * Calculations will be done for precision in sparse column major ordering.
+ *
+ * @param X nxp data matrix.
+ * @param Prec pxp spd precision matrix.
+ * @param perm_indices vector of unique int 0<i<p-1 defining AMD permutation of `Prec`.
+ * @param gradient_scale factor to scale the gradient as gradient_scale * ddmrf().
+ * @return negative log-likelihood.
+ */
 Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices, double gradient_scale)
 {
 
     // Compress Prec in column-major format
     Prec.makeCompressed();
 
-    // int nz = Prec.nonZeros();
+    // We need only work with lower-triangular view of precision.
     SpTMat<double> Prec_tril = Prec.triangularView<Eigen::Lower>();
     int nparameters = Prec_tril.nonZeros();
-    // std::cout << "nparameters: " << nparameters << std::endl;
     int p = Prec_tril.cols();
-    // std::cout << Prec_tril.toDense() << std::endl;
 
     // Start stack
     adept::Stack stack;
@@ -492,13 +526,9 @@ Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices
     // See Sec. 5.4 of adept docs www.met.reading.ac.uk/clouds/adept/adept_documentation_1.1.pdf
     nll.set_gradient(gradient_scale);
 
-    // checked nll.value is correct, implies Prec_ad is correct
-    // std::cout << nll.value() << std::endl;
-
     stack.compute_adjoint();
 
     // Extract gradient elements
-    // std::cout << "nparameters: " << nparameters << std::endl;
     Tvec<double> grad(nparameters);
     for (int i = 0; i < nparameters; i++)
     {
@@ -507,9 +537,15 @@ Tvec<double> ddmrf(Tmat<double> &X, SpTMat<double> &Prec, Tvec<int> perm_indices
     return grad;
 }
 
-/*
- * Returns gradient of dmrf w.r.t. vectorized (row-by-row) L
- * L: sparse col-major matrix, left Cholesky factor of precision matrix.
+/**
+ * @brief Gradient of negative log-likelihood of GMRF w.r.t. lower cholesky factor of precision.
+ * Calculations will be done for cholesky factor in sparse column major ordering.
+ *
+ * @param X nxp data matrix.
+ * @param L pxp spd cholesky factor of precision matrix.
+ * @param perm_indices vector of unique int 0<i<p-1 defining AMD permutation of `precision matrix`.
+ * @param gradient_scale factor to scale the gradient as gradient_scale * ddmrfL().
+ * @return negative log-likelihood.
  */
 Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices, double gradient_scale)
 {
@@ -553,9 +589,6 @@ Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices, 
     // See Sec. 5.4 of adept docs www.met.reading.ac.uk/clouds/adept/adept_documentation_1.1.pdf
     nll.set_gradient(gradient_scale);
     stack.compute_adjoint();
-
-    // checked nll.value is correct, implies Prec_ad is correct
-    // std::cout << nll.value() << std::endl;
 
     // Extract gradient elements
     Tvec<double> grad(nz);
