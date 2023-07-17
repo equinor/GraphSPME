@@ -277,8 +277,7 @@ std::vector<TTriplet<T>> to_triplets(SpTMat<T> &M)
     std::vector<TTriplet<T>> v;
     for (int i = 0; i < M.outerSize(); i++)
         for (typename SpTMat<T>::InnerIterator it(M, i); it; ++it)
-            // v.emplace_back(it.row(), it.col(), it.value());
-            v.push_back(TTriplet<T>(it.row(), it.col(), it.value()));
+            v.emplace_back(it.row(), it.col(), it.value());
     return v;
 }
 
