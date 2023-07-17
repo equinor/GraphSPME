@@ -20,7 +20,9 @@ def test_prec_sparse_non_csr():
 )
 def test_prec_sparse_x_wrong_dimensions(x):
     Graph = sparse.diags([1, 1, 1], 0, format="csr")
-    with pytest.raises(ValueError, match=r".*x should be a two dimensional matrix.*"):
+    with pytest.raises(
+        ValueError, match=r".*x should be a two dimensional matrix.*"
+    ):
         graphspme.prec_sparse(x, Graph)
 
 
@@ -28,6 +30,7 @@ def test_prec_sparse_dimension_mismatch():
     x = np.tile(np.ones([4]), (4, 1))
     Graph = sparse.diags([1, 1, 1], 0, format="csr")
     with pytest.raises(
-        ValueError, match=r".*but got x.shape = \(4, 4\) and Graph.shape = \(3, 3\)"
+        ValueError,
+        match=r".*but got x.shape = \(4, 4\) and Graph.shape = \(3, 3\)",
     ):
         graphspme.prec_sparse(x, Graph)
