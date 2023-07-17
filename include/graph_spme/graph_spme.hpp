@@ -379,13 +379,21 @@ T logdet_sparse_spd(SpTMat<T> &P, Tvec<int> perm_indices)
     return 2.0 * L.diagonal().array().log().sum();
 }
 
+/**
+ * @brief Approximate Minimum Degree (AMD) ordering.
+ * The "state" of a Cholesky solver is in the optimized ordering.
+ * Holding the permutation vector allows a purely function-based approach when working with the Cholesky decomposition.
+ *
+ * @param A sparse SPD pxp matrix.
+ * @return Tvec<int> permutation indices, unique ints 0<i<p-1 defining permutation of `A` yielding AMD factorization.
+ */
 Tvec<int> compute_amd_ordering(SpTMat<double> &A)
 {
     Eigen::AMDOrdering<int> ordering;
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(A.rows());
     ordering(A, Perm);
     Perm = Perm.transpose();
-    return Perm.indices(); // equals the cholesky AMD ordering calling cholesky.permutationP().indices()
+    return Perm.indices(); // equals Cholesky AMD cholesky.permutationP().indices()
 }
 
 /*
