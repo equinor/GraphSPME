@@ -364,13 +364,17 @@ SpTMat<double> chol_to_precision(SpTMat<double> &L, Tvec<int> perm_indices)
     return Prec;
 }
 
+/**
+ * @brief Log determinant of sparse SPD matrix `P`.
+ * Computed efficiently using cholesky factor with known permutation defined by `perm_indices`
+ *
+ * @param P sparse SPD matrix.
+ * @param perm_indices vector of unique int 0<i<p-1 defining permutation of `P`.
+ * @return log determinant of `P`
+ */
 template <class T>
-T preclogdet(SpTMat<T> &P, Tvec<int> perm_indices)
+T logdet_sparse_spd(SpTMat<T> &P, Tvec<int> perm_indices)
 {
-    // Eigen::SimplicialLLT<SpTMat<T>> cholesky;
-    // cholesky.analyzePattern(P);
-    // cholesky.factorize(P);
-    // SpTMat<T> L = cholesky.matrixL();
     SpTMat<T> L = _cholesky_factor(P, perm_indices);
     return 2.0 * L.diagonal().array().log().sum();
 }
@@ -395,7 +399,7 @@ T _dmrf(Tmat<double> &X, SpTMat<T> &Prec, Tvec<int> perm_indices)
     // Compress Prec in column-major format
     Prec.makeCompressed();
     T trace_S_Prec = trace_S_Q<T>(X, Prec);
-    T prec_log_det = preclogdet(Prec, perm_indices);
+    T prec_log_det = logdet_sparse_spd(Prec, perm_indices);
     T nll = 0.5 * (trace_S_Prec - prec_log_det);
     return nll;
 }
