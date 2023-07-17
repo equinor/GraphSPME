@@ -281,14 +281,16 @@ std::vector<TTriplet<T>> to_triplets(SpTMat<T> &M)
     return v;
 }
 
-/*
- * Returns trace of matrix product S*Q.
- * Assuming S is symmetric pxp and Q sparse symmetric.
- * Trace is computation and memory efficient given assumptions above.
+/**
+ * Computes the trace of SQ where S is the normalized scatter matrix from data X.
+ * The evaluation is computation and memory efficient given that:
  * - S is never explicitly calculated (memory efficient)
  * - Only iterates over non-zero elements of Q in trace formula.
- * X: data-matrix nxp. S = (X-mean(X))^T * (X-mean(X))
- * Q: sparse matrix Q
+ * Note that Symmetry in S and Q is not exploited.
+ *
+ * @param X nxp data matrix.
+ * @param Q sparse SPD pxp matrix.
+ * @return The trace of SQ.
  */
 template <class T>
 T trace_S_Q(Tmat<double> &X, SpTMat<T> &Prec)
