@@ -15,6 +15,7 @@ from _graphspme import (
     _dmrfL,
     _ddmrf,
     _ddmrfL,
+    _ensure_eigenvalue_lower_bound,
 )
 
 
@@ -113,3 +114,9 @@ def ddmrfL(
     gradient_scale: float,
 ) -> NDArray:
     return _ddmrfL(X, Prec, perm_indices, gradient_scale)
+
+
+def ensure_eigenvalue_lower_bound(
+    A: scipy.sparse.csc_matrix, eps: float = 1e-3, is_symmetric: bool = True
+) -> scipy.sparse.csc_matrix:
+    return _ensure_eigenvalue_lower_bound(A, eps, is_symmetric)

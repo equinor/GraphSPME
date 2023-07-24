@@ -74,6 +74,10 @@ PYBIND11_MODULE(_graphspme, m)
         ddmrfL
     )pbdoc");
 
+    m.def("_ensure_eigenvalue_lower_bound", &ensure_eigenvalue_lower_bound, R"pbdoc(
+        ensure_eigenvalue_lower_bound
+    )pbdoc");
+
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else

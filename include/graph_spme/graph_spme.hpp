@@ -599,6 +599,51 @@ Tvec<double> ddmrfL(Tmat<double> &X, SpTMat<double> &L, Tvec<int> perm_indices, 
     return grad;
 }
 
+/*
+ * Returns the nearest symmetric semidefinite matrix of A in Frobenius norm.
+ * The result is from
+ * Higham NJ (1988). “Computing a nearest symmetric positive semidefinite matrix.”
+ * A_opt=0.5*(H+U),
+ * H=0.5*(A+A.t) nearest symmetric matrix
+ * U: polar factor in polar decomposition H=PU
+ * The proof of A_opt also shows that
+ * A_opt=QD+Q.t,
+ * where QDQ.t is the eigen/spectral decomposition of H and D+_ii=max(eps>0, D_ii)
+ * A is symmetrized if is_symmetric evaluates to false.
+ */
+SpTMat<double> ensure_eigenvalue_lower_bound(
+    SpTMat<double> &A, double eps, bool is_symmetric)
+{
+    // Closest symmetrization
+    if (!is_symmetric)
+    {
+        ensure_symmetry(A);
+    }
+    // Eigendecomposition
+    Eigen::MatrixXd A_dense(A);
+    Eigen::EigenSolver<Eigen::MatrixXd> eigen_decomposition(A_dense);
+    Eigen::VectorXd eigenvalues = eigen_decomposition.eigenvalues().array().real();
+    Eigen::MatrixXd D = eigenvalues.asDiagonal();
+    Eigen::MatrixXd Q = eigen_decomposition.eigenvectors().array().real();
+    // Modify eigenvalues
+    for (int i = 0; i < D.rows(); i++)
+    {
+        D(i, i) = std::max(eps, D(i, i));
+    }
+    // Build and return closest symmetric semidefinite in FB-norm
+    Eigen::MatrixXd QDpQt = Q * D;
+    QDpQt *= Q.transpose();
+    // Pick out sparse elements -- whatever non-zero is in zero-elements is numerical error
+    std::vector<TTriplet<double>> A_triplets = to_triplets<double>(A);
+    for (int i = 0; i < A_triplets.size(); i++)
+    {
+        TTriplet<double> tri = TTriplet<double>(A_triplets[i].row(), A_triplets[i].col(), QDpQt(A_triplets[i].row(), A_triplets[i].col()));
+        A_triplets[i] = tri;
+    }
+    A.setFromTriplets(A_triplets.begin(), A_triplets.end());
+    return A;
+}
+
 ///////////////////////////////////
 
 /*
