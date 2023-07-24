@@ -73,3 +73,71 @@ double _prec_aic(
 ) {
     return prec_aic(X, Prec);
 }
+
+// [[Rcpp::export(.compute_amd_ordering)]]
+Eigen::Matrix<int,Eigen::Dynamic,1> _compute_amd_ordering(
+        Eigen::SparseMatrix<double> &A
+) {
+    return compute_amd_ordering(A);
+}
+
+// [[Rcpp::export(.cholesky_factor)]]
+Eigen::SparseMatrix<double> __cholesky_factor(
+        Eigen::SparseMatrix<double> &P,
+        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices
+) {
+    return cholesky_factor(P, perm_indices);
+}
+
+// [[Rcpp::export(.chol_to_precision)]]
+Eigen::SparseMatrix<double> _chol_to_precision(
+        Eigen::SparseMatrix<double> &L,
+        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices
+) {
+    return chol_to_precision(L, perm_indices);
+}
+
+// [[Rcpp::export(.dmrf)]]
+double __dmrf(
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
+        Eigen::SparseMatrix<double>& Prec,
+        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices
+) {
+    return dmrf(X, Prec, perm_indices);
+}
+
+// [[Rcpp::export(.dmrfL)]]
+double __dmrfL(
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
+        Eigen::SparseMatrix<double>& L,
+        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices
+) {
+    return dmrfL(X, L, perm_indices);
+}
+
+// [[Rcpp::export(.ddmrf)]]
+Eigen::Matrix<double,Eigen::Dynamic,1> __ddmrf(
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
+        Eigen::SparseMatrix<double>& Prec,
+        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices,
+        double gradient_scale
+) {
+    return ddmrf(X, Prec, perm_indices, gradient_scale);
+}
+
+// [[Rcpp::export(.ddmrfL)]]
+Eigen::Matrix<double,Eigen::Dynamic,1> __ddmrfL(
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
+        Eigen::SparseMatrix<double>& L,
+        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices,
+        double gradient_scale
+) {
+    return ddmrfL(X, L, perm_indices, gradient_scale);
+}
+
+// [[Rcpp::export(.ensure_eigenvalue_lower_bound)]]
+Eigen::SparseMatrix<double> _ensure_eigenvalue_lower_bound(
+        Eigen::SparseMatrix<double> &A, double eps, bool is_symmetric
+) {
+    return ensure_eigenvalue_lower_bound(A, eps, is_symmetric);
+}

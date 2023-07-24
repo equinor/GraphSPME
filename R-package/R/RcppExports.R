@@ -33,3 +33,35 @@
     .Call(`_GraphSPME__prec_aic`, X, Prec)
 }
 
+.compute_amd_ordering <- function(A) {
+    .Call(`_GraphSPME__compute_amd_ordering`, A)
+}
+
+.cholesky_factor <- function(P, perm_indices) {
+    .Call(`_GraphSPME___cholesky_factor`, P, perm_indices)
+}
+
+.chol_to_precision <- function(L, perm_indices) {
+    .Call(`_GraphSPME__chol_to_precision`, L, perm_indices)
+}
+
+.dmrf <- function(X, Prec, perm_indices) {
+    .Call(`_GraphSPME___dmrf`, X, Prec, perm_indices)
+}
+
+.dmrfL <- function(X, L, perm_indices) {
+    .Call(`_GraphSPME___dmrfL`, X, L, perm_indices)
+}
+
+.ddmrf <- function(X, Prec, perm_indices, gradient_scale) {
+    .Call(`_GraphSPME___ddmrf`, X, Prec, perm_indices, gradient_scale)
+}
+
+.ddmrfL <- function(X, L, perm_indices, gradient_scale) {
+    .Call(`_GraphSPME___ddmrfL`, X, L, perm_indices, gradient_scale)
+}
+
+.ensure_eigenvalue_lower_bound <- function(A, eps, is_symmetric) {
+    .Call(`_GraphSPME__ensure_eigenvalue_lower_bound`, A, eps, is_symmetric)
+}
+
