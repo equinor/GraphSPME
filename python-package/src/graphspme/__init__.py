@@ -34,7 +34,7 @@ def prec_sparse(
     cov_shrinkage: bool = True,
     symmetrization: bool = True,
 ) -> scipy.sparse.csc_matrix:
-    if not scipy.sparse.isspmatrix_csr(Graph):
+    if not scipy.sparse.isspmatrix_csc(Graph):
         raise ValueError(
             "Graph matrix is not on csc (Compressed Sparse Column) format. "
             "This is usually solved by adding format='csc' to the"
