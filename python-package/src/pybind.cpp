@@ -78,6 +78,14 @@ PYBIND11_MODULE(_graphspme, m)
         ensure_eigenvalue_lower_bound
     )pbdoc");
 
+    m.def("_dmrf_grad", &dmrf_grad, R"pbdoc(
+        dmrf_grad
+    )pbdoc");
+
+    m.def("_dmrf_hess", &dmrf_hess, R"pbdoc(
+        dmrf_hess
+    )pbdoc");
+
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else

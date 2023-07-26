@@ -4,6 +4,7 @@
 #include <Eigen/Sparse>
 
 using Dmat = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
+using Dvec = Eigen::Matrix<double, Eigen::Dynamic, 1>;
 using SpdMat = Eigen::SparseMatrix<double, Eigen::ColMajor>;
 // using SpdMatMap = Eigen::MappedSparseMatrix<double>;
 using dTriplet = Eigen::Triplet<double>;
@@ -152,18 +153,16 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(
 }
 
 /*
- *  Sparse precision matrix inverse
- *  Employs cojugate gradient
- *  Recomended by http://eigen.tuxfamily.org/dox-devel/group__TopicSparseSystems.html
+ *  Sparse precision matrix inverse via sparse cholesky
  */
 Dmat sparse_matrix_inverse(SpdMat &A)
 {
     int p = A.rows();
-    Eigen::ConjugateGradient<Eigen::SparseMatrix<double>> solver;
-    solver.compute(A);
-    Eigen::SparseMatrix<double> I(p, p);
+    Eigen::SimplicialLLT<SpdMat> cholesky;
+    cholesky.compute(A);
+    SpdMat I(p, p);
     I.setIdentity();
-    auto A_inv = solver.solve(I);
+    Dmat A_inv = cholesky.solve(I);
     return A_inv;
 }
 
@@ -642,6 +641,89 @@ SpTMat<double> ensure_eigenvalue_lower_bound(
     }
     A.setFromTriplets(A_triplets.begin(), A_triplets.end());
     return A;
+}
+
+/////// hand-coded derivatives ////////
+Dmat dtrace_S_Prec(Dmat &X)
+{
+    int n = X.rows();
+    int p = X.cols();
+    Dmat X_centered = X.rowwise() - X.colwise().mean();
+    Dmat cov_x = X_centered.transpose() * X_centered;
+    cov_x = cov_x / n;
+    Dmat cov_x_nondiag = cov_x;
+    cov_x_nondiag.diagonal() = Eigen::VectorXd::Zero(p);
+    return cov_x + cov_x_nondiag;
+}
+
+Dmat dprec_log_det(SpdMat &Prec)
+{
+    int p = Prec.rows();
+    Dmat res = sparse_matrix_inverse(Prec);
+    // Multiply every element of the matrix by 2 except the diagonal elements
+    for (int i = 0; i < res.rows(); ++i)
+    {
+        for (int j = 0; j < res.cols(); ++j)
+        {
+            if (i != j)
+            {
+                res(i, j) *= 2.0;
+            }
+        }
+    }
+    return res;
+}
+
+Dmat dmrf_grad(Dmat &X, SpdMat &Prec, SpdMat &grad_elements_pick)
+{
+    grad_elements_pick = grad_elements_pick.triangularView<Eigen::Lower>();
+    int nparameters = grad_elements_pick.nonZeros();
+    std::vector<dTriplet> grad_elements_pick_triplets = to_triplets<double>(grad_elements_pick);
+    Dmat grad_mat = 0.5 * (dtrace_S_Prec(X) - dprec_log_det(Prec));
+    Dvec grad(nparameters);
+    for (int i = 0; i < nparameters; i++)
+    {
+        grad[i] = grad_mat(
+            grad_elements_pick_triplets[i].row(),
+            grad_elements_pick_triplets[i].col());
+    }
+    return grad;
+}
+
+Dmat dmrf_hess(SpdMat &Prec, SpdMat &grad_elements_pick)
+{
+    // grad = -0.5 * (2Xinv - elementwisemul(Xinv, I))
+    // grad_elements_pick should already be lower triangular, but just in case
+    grad_elements_pick = grad_elements_pick.triangularView<Eigen::Lower>();
+    int nparameters = grad_elements_pick.nonZeros();
+    std::vector<dTriplet> grad_elements_pick_triplets = to_triplets<double>(grad_elements_pick);
+    int p = Prec.rows();
+    Dmat hess(nparameters, nparameters);
+    int i, j, k, l;
+    // find symmetric(!) matrix derivative of X_inv and then apply it to grad
+    double dX_inv;
+    Dmat cov = sparse_matrix_inverse(Prec);
+    for (int m = 0; m < nparameters; m++)
+    {
+        i = grad_elements_pick_triplets[m].row();
+        j = grad_elements_pick_triplets[m].col();
+        for (int n = 0; n < nparameters; n++)
+        {
+            k = grad_elements_pick_triplets[n].row();
+            l = grad_elements_pick_triplets[n].col();
+            // dX_inv = -cov(k,i)*cov(j,l);
+            dX_inv = -cov(k, i) * cov(j, l);
+            dX_inv += -cov(k, j) * cov(i, l);
+            if (i == j)
+            {
+                dX_inv -= -cov(k, i) * cov(j, l);
+            }
+            // apply to grad
+            hess(m, n) = k != l ? 2.0 * dX_inv : dX_inv;
+            hess(m, n) = -0.5 * hess(m, n);
+        }
+    }
+    return hess;
 }
 
 ///////////////////////////////////

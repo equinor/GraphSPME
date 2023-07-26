@@ -16,6 +16,8 @@ from _graphspme import (
     _ddmrf,
     _ddmrfL,
     _ensure_eigenvalue_lower_bound,
+    _dmrf_grad,
+    _dmrf_hess,
 )
 
 
@@ -120,3 +122,18 @@ def ensure_eigenvalue_lower_bound(
     A: scipy.sparse.csc_matrix, eps: float = 1e-3, is_symmetric: bool = True
 ) -> scipy.sparse.csc_matrix:
     return _ensure_eigenvalue_lower_bound(A, eps, is_symmetric)
+
+
+def dmrf_grad(
+    X: NDArray,
+    Prec: scipy.sparse.csc_matrix,
+    grad_elements_pick: scipy.sparse.csc_matrix,
+) -> NDArray:
+    return _dmrf_grad(X, Prec, grad_elements_pick)
+
+
+def dmrf_hess(
+    Prec: scipy.sparse.csc_matrix,
+    grad_elements_pick: scipy.sparse.csc_matrix,
+) -> NDArray:
+    return _dmrf_hess(Prec, grad_elements_pick)
