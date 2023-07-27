@@ -655,11 +655,22 @@ Dmat dtrace_S_Prec(Dmat &X)
     int n = X.rows();
     int p = X.cols();
     Dmat X_centered = X.rowwise() - X.colwise().mean();
-    Dmat cov_x = X_centered.transpose() * X_centered;
-    cov_x = cov_x / n;
-    Dmat cov_x_nondiag = cov_x;
-    cov_x_nondiag.diagonal() = Eigen::VectorXd::Zero(p);
-    return cov_x + cov_x_nondiag;
+    Dmat cov_sample = X_centered.transpose() * X_centered;
+    cov_sample = cov_sample / n;
+    // Multiply every element of the matrix by 2 except the diagonal elements
+    // Corresponds to multiplication with Duplication matrix and due to symmetry of Prec
+    // https://en.wikipedia.org/wiki/Duplication_and_elimination_matrices
+    for (int i = 0; i < p; i++)
+    {
+        for (int j = 0; j < p; j++)
+        {
+            if (i != j)
+            {
+                cov_sample(i, j) *= 2.0;
+            }
+        }
+    }
+    return cov_sample;
 }
 
 /**
@@ -742,7 +753,6 @@ Dmat dmrf_hess(SpdMat &Prec, SpdMat &grad_elements_pick)
         {
             k = grad_elements_pick_triplets[n].row();
             l = grad_elements_pick_triplets[n].col();
-            // dX_inv = -cov(k,i)*cov(j,l);
             dX_inv = -cov(k, i) * cov(j, l);
             dX_inv += -cov(k, j) * cov(i, l);
             if (i == j)
@@ -775,11 +785,11 @@ Dmat dmrfL_grad(Dmat &X, SpdMat &L, SpdMat &grad_elements_pick, Tvec<int> perm_i
     int p = X.cols();
     int n = X.rows();
     Dmat X_centered = X.rowwise() - X.colwise().mean();
-    Dmat cov_x = X_centered.transpose() * X_centered / n;
+    Dmat cov_sample = X_centered.transpose() * X_centered / n;
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
-    cov_x = Perm * cov_x;
-    cov_x = cov_x * Perm.transpose();
-    Dmat d_SPrec_dL = 2.0 * cov_x * L;
+    cov_sample = Perm * cov_sample;
+    cov_sample = cov_sample * Perm.transpose();
+    Dmat d_SPrec_dL = 2.0 * cov_sample * L;
     Eigen::VectorXd L_diag_inv = 2.0 / L.diagonal().array();
     Dmat d_logdetPrec_dL = Eigen::DiagonalMatrix<double, Eigen::Dynamic>(
         L_diag_inv);
@@ -812,10 +822,10 @@ Dmat dmrfL_hess(Dmat &X, SpdMat &L, SpdMat &grad_elements_pick, Tvec<int> perm_i
     int p = X.cols();
     int n = X.rows();
     Dmat X_centered = X.rowwise() - X.colwise().mean();
-    Dmat cov_x = X_centered.transpose() * X_centered / n;
+    Dmat cov_sample = X_centered.transpose() * X_centered / n;
     Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
-    cov_x = Perm * cov_x;
-    cov_x = cov_x * Perm.transpose();
+    cov_sample = Perm * cov_sample;
+    cov_sample = cov_sample * Perm.transpose();
     Dvec L_diag_square = L.diagonal().array().pow(2.0);
     Dmat hess(nparameters, nparameters);
     hess.setZero();
@@ -831,7 +841,7 @@ Dmat dmrfL_hess(Dmat &X, SpdMat &L, SpdMat &grad_elements_pick, Tvec<int> perm_i
             l = grad_elements_pick_triplets[n].col();
             if (i == k && j == l)
             {
-                hess(m, n) = cov_x(i, j);
+                hess(m, n) = cov_sample(i, j);
                 if (i == j)
                 {
                     hess(m, n) += 1.0 / L_diag_square[i];
