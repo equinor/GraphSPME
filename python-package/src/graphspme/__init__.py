@@ -13,8 +13,6 @@ from _graphspme import (
     _chol_to_precision,
     _dmrf,
     _dmrfL,
-    _ddmrf,
-    _ddmrfL,
     _ensure_eigenvalue_lower_bound,
     _dmrf_grad,
     _dmrf_hess,
@@ -100,24 +98,6 @@ def dmrfL(
     X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray
 ) -> float:
     return _dmrfL(X, Prec, perm_indices)
-
-
-def ddmrf(
-    X: NDArray,
-    Prec: scipy.sparse.csc_matrix,
-    perm_indices: NDArray,
-    gradient_scale: float,
-) -> NDArray:
-    return _ddmrf(X, Prec, perm_indices, gradient_scale)
-
-
-def ddmrfL(
-    X: NDArray,
-    Prec: scipy.sparse.csc_matrix,
-    perm_indices: NDArray,
-    gradient_scale: float,
-) -> NDArray:
-    return _ddmrfL(X, Prec, perm_indices, gradient_scale)
 
 
 def ensure_eigenvalue_lower_bound(

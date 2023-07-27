@@ -66,14 +66,6 @@ PYBIND11_MODULE(_graphspme, m)
         dmrfL
     )pbdoc");
 
-    m.def("_ddmrf", &ddmrf, R"pbdoc(
-        ddmrf
-    )pbdoc");
-
-    m.def("_ddmrfL", &ddmrfL, R"pbdoc(
-        ddmrfL
-    )pbdoc");
-
     m.def("_ensure_eigenvalue_lower_bound", &ensure_eigenvalue_lower_bound, R"pbdoc(
         ensure_eigenvalue_lower_bound
     )pbdoc");
