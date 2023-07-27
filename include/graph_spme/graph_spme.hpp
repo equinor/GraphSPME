@@ -3,10 +3,12 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
+template <class T>
+using Tvec = Eigen::Matrix<T, Eigen::Dynamic, 1>;
+
 using Dmat = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
 using Dvec = Eigen::Matrix<double, Eigen::Dynamic, 1>;
 using SpdMat = Eigen::SparseMatrix<double, Eigen::ColMajor>;
-// using SpdMatMap = Eigen::MappedSparseMatrix<double>;
 using dTriplet = Eigen::Triplet<double>;
 
 /*
@@ -232,20 +234,6 @@ Eigen::SparseMatrix<double> prec_sparse(
 /*
  ***** fast likelihood based functions and derivatives for estimation  of precision *****
  */
-
-// #include <math.h>
-
-// template <class T>
-// using Tmat = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
-
-template <class T>
-using Tvec = Eigen::Matrix<T, Eigen::Dynamic, 1>;
-
-// template <class T>
-// using SpTMat = Eigen::SparseMatrix<T, Eigen::ColMajor>;
-
-// template <class T>
-// using TTriplet = Eigen::Triplet<T>;
 
 /**
  * @brief Custom sparse matrix M to vector or triplets.
