@@ -644,6 +644,12 @@ SpTMat<double> ensure_eigenvalue_lower_bound(
 }
 
 /////// hand-coded derivatives ////////
+/**
+ * @brief Matrix derivative of tr(S*Prec)/n w.r.t. Prec
+ *
+ * @param X nxp data matrix
+ * @return matrix derivative
+ */
 Dmat dtrace_S_Prec(Dmat &X)
 {
     int n = X.rows();
@@ -656,11 +662,19 @@ Dmat dtrace_S_Prec(Dmat &X)
     return cov_x + cov_x_nondiag;
 }
 
+/**
+ * @brief Matrix derivative of logdet(Prec) w.r.t. Prec
+ *
+ * @param Prec pxp spd precision matrix
+ * @return matrix derivative
+ */
 Dmat dprec_log_det(SpdMat &Prec)
 {
     int p = Prec.rows();
     Dmat res = sparse_matrix_inverse(Prec);
     // Multiply every element of the matrix by 2 except the diagonal elements
+    // Corresponds to multiplication with Duplication matrix and due to symmetry of Prec
+    // https://en.wikipedia.org/wiki/Duplication_and_elimination_matrices
     for (int i = 0; i < res.rows(); ++i)
     {
         for (int j = 0; j < res.cols(); ++j)
@@ -674,6 +688,15 @@ Dmat dprec_log_det(SpdMat &Prec)
     return res;
 }
 
+/**
+ * @brief Gradient of negative log-likelihood of GMRF w.r.t. precision.
+ * Calculations will be done for precision in sparse column major ordering.
+ *
+ * @param X nxp data matrix.
+ * @param Prec pxp spd precision matrix.
+ * @param grad_elements_pick pxp spd subset of `Prec` for which to return the gradient.
+ * @return negative log-likelihood.
+ */
 Dmat dmrf_grad(Dmat &X, SpdMat &Prec, SpdMat &grad_elements_pick)
 {
     grad_elements_pick = grad_elements_pick.triangularView<Eigen::Lower>();
@@ -690,6 +713,14 @@ Dmat dmrf_grad(Dmat &X, SpdMat &Prec, SpdMat &grad_elements_pick)
     return grad;
 }
 
+/**
+ * @brief Hessian of negative log-likelihood of GMRF w.r.t. precision.
+ * Calculations will be done for precision in sparse column major ordering.
+ *
+ * @param Prec pxp spd precision matrix.
+ * @param grad_elements_pick pxp spd subset of `Prec` for which to return the hessian.
+ * @return negative log-likelihood.
+ */
 Dmat dmrf_hess(SpdMat &Prec, SpdMat &grad_elements_pick)
 {
     // grad = -0.5 * (2Xinv - elementwisemul(Xinv, I))
@@ -726,6 +757,16 @@ Dmat dmrf_hess(SpdMat &Prec, SpdMat &grad_elements_pick)
     return hess;
 }
 
+/**
+ * @brief Gradient of negative log-likelihood of GMRF w.r.t. lower cholesky factor of precision.
+ * Calculations and all vectorizations will be done for cholesky factor in sparse column major ordering.
+ *
+ * @param X nxp data matrix.
+ * @param L pxp spd cholesky factor of precision matrix.
+ * @param grad_elements_pick pxp spd subset of `L` for which to return the gradient.
+ * @param perm_indices vector of unique int 0<i<p-1 defining AMD permutation of `precision matrix`.
+ * @return gradient of Gaussian negative log-likelihood w.r.t. elements in L.
+ */
 Dmat dmrfL_grad(Dmat &X, SpdMat &L, SpdMat &grad_elements_pick, Tvec<int> perm_indices)
 {
     grad_elements_pick = grad_elements_pick.triangularView<Eigen::Lower>();
@@ -753,6 +794,16 @@ Dmat dmrfL_grad(Dmat &X, SpdMat &L, SpdMat &grad_elements_pick, Tvec<int> perm_i
     return grad;
 }
 
+/**
+ * @brief Hessian of negative log-likelihood of GMRF w.r.t. lower cholesky factor of precision.
+ * Calculations and all vectorizations will be done for cholesky factor in sparse column major ordering.
+ *
+ * @param X nxp data matrix.
+ * @param L pxp spd cholesky factor of precision matrix.
+ * @param grad_elements_pick pxp spd subset of `L` for which to return the hessian.
+ * @param perm_indices vector of unique int 0<i<p-1 defining AMD permutation of `precision matrix`.
+ * @return Hessian of Gaussian negative log-likelihood w.r.t. elements in L.
+ */
 Dmat dmrfL_hess(Dmat &X, SpdMat &L, SpdMat &grad_elements_pick, Tvec<int> perm_indices)
 {
     grad_elements_pick = grad_elements_pick.triangularView<Eigen::Lower>();
