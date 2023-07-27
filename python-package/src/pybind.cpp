@@ -86,6 +86,14 @@ PYBIND11_MODULE(_graphspme, m)
         dmrf_hess
     )pbdoc");
 
+    m.def("_dmrfL_grad", &dmrfL_grad, R"pbdoc(
+        dmrfL_grad
+    )pbdoc");
+
+    m.def("_dmrfL_hess", &dmrfL_hess, R"pbdoc(
+        dmrfL_hess
+    )pbdoc");
+
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else

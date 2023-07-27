@@ -18,6 +18,8 @@ from _graphspme import (
     _ensure_eigenvalue_lower_bound,
     _dmrf_grad,
     _dmrf_hess,
+    _dmrfL_grad,
+    _dmrfL_hess,
 )
 
 
@@ -137,3 +139,21 @@ def dmrf_hess(
     grad_elements_pick: scipy.sparse.csc_matrix,
 ) -> NDArray:
     return _dmrf_hess(Prec, grad_elements_pick)
+
+
+def dmrfL_grad(
+    X: NDArray,
+    L: scipy.sparse.csc_matrix,
+    grad_elements_pick: scipy.sparse.csc_matrix,
+    perm_indices: NDArray,
+) -> NDArray:
+    return _dmrfL_grad(X, L, grad_elements_pick, perm_indices)
+
+
+def dmrfL_hess(
+    X: NDArray,
+    L: scipy.sparse.csc_matrix,
+    grad_elements_pick: scipy.sparse.csc_matrix,
+    perm_indices: NDArray,
+) -> NDArray:
+    return _dmrfL_hess(X, L, grad_elements_pick, perm_indices)

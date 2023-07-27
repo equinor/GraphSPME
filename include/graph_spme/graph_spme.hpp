@@ -726,6 +726,71 @@ Dmat dmrf_hess(SpdMat &Prec, SpdMat &grad_elements_pick)
     return hess;
 }
 
+Dmat dmrfL_grad(Dmat &X, SpdMat &L, SpdMat &grad_elements_pick, Tvec<int> perm_indices)
+{
+    grad_elements_pick = grad_elements_pick.triangularView<Eigen::Lower>();
+    int nparameters = grad_elements_pick.nonZeros();
+    std::vector<dTriplet> grad_elements_pick_triplets = to_triplets<double>(grad_elements_pick);
+    int p = X.cols();
+    int n = X.rows();
+    Dmat X_centered = X.rowwise() - X.colwise().mean();
+    Dmat cov_x = X_centered.transpose() * X_centered / n;
+    Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
+    cov_x = Perm * cov_x;
+    cov_x = cov_x * Perm.transpose();
+    Dmat d_SPrec_dL = 2.0 * cov_x * L;
+    Eigen::VectorXd L_diag_inv = 2.0 / L.diagonal().array();
+    Dmat d_logdetPrec_dL = Eigen::DiagonalMatrix<double, Eigen::Dynamic>(
+        L_diag_inv);
+    Dmat grad_mat = 0.5 * (d_SPrec_dL - d_logdetPrec_dL);
+    Tvec<double> grad(nparameters);
+    for (int i = 0; i < nparameters; i++)
+    {
+        grad[i] = grad_mat(
+            grad_elements_pick_triplets[i].row(),
+            grad_elements_pick_triplets[i].col());
+    }
+    return grad;
+}
+
+Dmat dmrfL_hess(Dmat &X, SpdMat &L, SpdMat &grad_elements_pick, Tvec<int> perm_indices)
+{
+    grad_elements_pick = grad_elements_pick.triangularView<Eigen::Lower>();
+    int nparameters = grad_elements_pick.nonZeros();
+    std::vector<TTriplet<double>> grad_elements_pick_triplets = to_triplets<double>(grad_elements_pick);
+    int p = X.cols();
+    int n = X.rows();
+    Dmat X_centered = X.rowwise() - X.colwise().mean();
+    Dmat cov_x = X_centered.transpose() * X_centered / n;
+    Eigen::PermutationMatrix<Eigen::Dynamic, Eigen::Dynamic> Perm(perm_indices);
+    cov_x = Perm * cov_x;
+    cov_x = cov_x * Perm.transpose();
+    Dvec L_diag_square = L.diagonal().array().pow(2.0);
+    Dmat hess(nparameters, nparameters);
+    hess.setZero();
+    int i, j, k, l;
+    double dX_inv;
+    for (int m = 0; m < nparameters; m++)
+    {
+        i = grad_elements_pick_triplets[m].row();
+        j = grad_elements_pick_triplets[m].col();
+        for (int n = 0; n < nparameters; n++)
+        {
+            k = grad_elements_pick_triplets[n].row();
+            l = grad_elements_pick_triplets[n].col();
+            if (i == k && j == l)
+            {
+                hess(m, n) = cov_x(i, j);
+                if (i == j)
+                {
+                    hess(m, n) += 1.0 / L_diag_square[i];
+                }
+            }
+        }
+    }
+    return hess;
+}
+
 ///////////////////////////////////
 
 /*
