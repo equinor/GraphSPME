@@ -53,12 +53,20 @@
     .Call(`_GraphSPME___dmrfL`, X, L, perm_indices)
 }
 
-.ddmrf <- function(X, Prec, perm_indices, gradient_scale) {
-    .Call(`_GraphSPME___ddmrf`, X, Prec, perm_indices, gradient_scale)
+.dmrf_grad <- function(X, Prec, grad_elements_pick) {
+    .Call(`_GraphSPME__dmrf_grad`, X, Prec, grad_elements_pick)
 }
 
-.ddmrfL <- function(X, L, perm_indices, gradient_scale) {
-    .Call(`_GraphSPME___ddmrfL`, X, L, perm_indices, gradient_scale)
+.dmrf_hess <- function(Prec, grad_elements_pick) {
+    .Call(`_GraphSPME__dmrf_hess`, Prec, grad_elements_pick)
+}
+
+.dmrfL_grad <- function(X, L, grad_elements_pick, perm_indices) {
+    .Call(`_GraphSPME__dmrfL_grad`, X, L, grad_elements_pick, perm_indices)
+}
+
+.dmrfL_hess <- function(X, L, grad_elements_pick, perm_indices) {
+    .Call(`_GraphSPME__dmrfL_hess`, X, L, grad_elements_pick, perm_indices)
 }
 
 .ensure_eigenvalue_lower_bound <- function(A, eps, is_symmetric) {

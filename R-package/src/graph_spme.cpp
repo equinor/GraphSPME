@@ -19,8 +19,7 @@ Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _cov_shrink_spd(
 
 /*
  *  Sparse precision matrix inverse
- *  Employs cojugate gradient
- *  Recomended by http://eigen.tuxfamily.org/dox-devel/group__TopicSparseSystems.html
+ *  Employs sparse cholesky
  */
 // [[Rcpp::export(.sparse_matrix_inverse)]]
 Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _sparse_matrix_inverse(Eigen::SparseMatrix<double>& A){
@@ -115,24 +114,41 @@ double __dmrfL(
     return dmrfL(X, L, perm_indices);
 }
 
-// [[Rcpp::export(.ddmrf)]]
-Eigen::Matrix<double,Eigen::Dynamic,1> __ddmrf(
+// [[Rcpp::export(.dmrf_grad)]]
+Eigen::Matrix<double,Eigen::Dynamic,1> _dmrf_grad(
         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
         Eigen::SparseMatrix<double>& Prec,
-        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices,
-        double gradient_scale
+        Eigen::SparseMatrix<double>& grad_elements_pick
 ) {
-    return ddmrf(X, Prec, perm_indices, gradient_scale);
+    return dmrf_grad(X, Prec, grad_elements_pick);
 }
 
-// [[Rcpp::export(.ddmrfL)]]
-Eigen::Matrix<double,Eigen::Dynamic,1> __ddmrfL(
+// [[Rcpp::export(.dmrf_hess)]]
+Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _dmrf_hess(
+        Eigen::SparseMatrix<double>& Prec,
+        Eigen::SparseMatrix<double>& grad_elements_pick
+) {
+    return dmrf_hess(Prec, grad_elements_pick);
+}
+
+// [[Rcpp::export(.dmrfL_grad)]]
+Eigen::Matrix<double,Eigen::Dynamic,1> _dmrfL_grad(
         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
         Eigen::SparseMatrix<double>& L,
-        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices,
-        double gradient_scale
+        Eigen::SparseMatrix<double>& grad_elements_pick,
+        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices
 ) {
-    return ddmrfL(X, L, perm_indices, gradient_scale);
+    return dmrfL_grad(X, L, grad_elements_pick, perm_indices);
+}
+
+// [[Rcpp::export(.dmrfL_hess)]]
+Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _dmrfL_hess(
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X,
+        Eigen::SparseMatrix<double>& L,
+        Eigen::SparseMatrix<double>& grad_elements_pick,
+        Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices
+) {
+    return dmrfL_hess(X, L, grad_elements_pick, perm_indices);
 }
 
 // [[Rcpp::export(.ensure_eigenvalue_lower_bound)]]
