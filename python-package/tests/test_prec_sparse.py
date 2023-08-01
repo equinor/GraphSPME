@@ -7,7 +7,7 @@ import graphspme
 
 def test_prec_sparse_non_csc():
     x = np.tile(np.ones([4]), (4, 1))
-    Graph = sparse.diags([1, 1, 1, 1], 0, format="csc")
+    Graph = sparse.diags([1, 1, 1, 1], 0, format="csr")
     with pytest.raises(
         ValueError,
         match=r".*Graph matrix is not on csc \(Compressed Sparse Column\) format.*",
