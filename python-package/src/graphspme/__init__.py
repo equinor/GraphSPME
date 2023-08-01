@@ -3,7 +3,22 @@ import sys
 import numpy
 import scipy.sparse
 
-from _graphspme import _prec_sparse, _cov_shrink_spd, _prec_nll, _prec_aic
+from _graphspme import (
+    _prec_sparse,
+    _cov_shrink_spd,
+    _prec_nll,
+    _prec_aic,
+    _compute_amd_ordering,
+    _cholesky_factor,
+    _chol_to_precision,
+    _dmrf,
+    _dmrfL,
+    _ensure_eigenvalue_lower_bound,
+    _dmrf_grad,
+    _dmrf_hess,
+    _dmrfL_grad,
+    _dmrfL_hess,
+)
 
 
 if sys.version_info >= (3, 7):
@@ -16,16 +31,16 @@ else:
 
 def prec_sparse(
     x: NDArray,
-    Graph: scipy.sparse.csr_matrix,
+    Graph: scipy.sparse.csc_matrix,
     markov_order: int = 1,
     cov_shrinkage: bool = True,
     symmetrization: bool = True,
-) -> scipy.sparse.csr_matrix:
-    if not scipy.sparse.isspmatrix_csr(Graph):
+) -> scipy.sparse.csc_matrix:
+    if not scipy.sparse.isspmatrix_csc(Graph):
         raise ValueError(
-            "Graph matrix is not on csr (Compressed Sparse Row) format. "
-            "This is usually solved by adding format='csr' to the"
-            "matrix initialization, e.g. identity(n=10, format='csr')"
+            "Graph matrix is not on csc (Compressed Sparse Column) format. "
+            "This is usually solved by adding format='csc' to the"
+            "matrix initialization, e.g. identity(n=10, format='csc')"
         )
     if len(x.shape) != 2:
         raise ValueError(
@@ -49,9 +64,76 @@ def cov_shrink_spd(x: NDArray) -> NDArray:
     return _cov_shrink_spd(x)
 
 
-def prec_nll(x: NDArray, Prec: scipy.sparse.csr_matrix) -> float:
+def prec_nll(x: NDArray, Prec: scipy.sparse.csc_matrix) -> float:
     return _prec_nll(x, Prec)
 
 
-def prec_aic(x: NDArray, Prec: scipy.sparse.csr_matrix) -> float:
+def prec_aic(x: NDArray, Prec: scipy.sparse.csc_matrix) -> float:
     return _prec_aic(x, Prec)
+
+
+def compute_amd_ordering(A: scipy.sparse.csc_matrix) -> NDArray:
+    return _compute_amd_ordering(A)
+
+
+def cholesky_factor(
+    A: scipy.sparse.csc_matrix, perm_indices: NDArray
+) -> scipy.sparse.csc_matrix:
+    return _cholesky_factor(A, perm_indices)
+
+
+def chol_to_precision(
+    L: scipy.sparse.csc_matrix, perm_indices: NDArray
+) -> scipy.sparse.csc_matrix:
+    return _chol_to_precision(L, perm_indices)
+
+
+def dmrf(
+    X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray
+) -> float:
+    return _dmrf(X, Prec, perm_indices)
+
+
+def dmrfL(
+    X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray
+) -> float:
+    return _dmrfL(X, Prec, perm_indices)
+
+
+def ensure_eigenvalue_lower_bound(
+    A: scipy.sparse.csc_matrix, eps: float = 1e-3, is_symmetric: bool = True
+) -> scipy.sparse.csc_matrix:
+    return _ensure_eigenvalue_lower_bound(A, eps, is_symmetric)
+
+
+def dmrf_grad(
+    X: NDArray,
+    Prec: scipy.sparse.csc_matrix,
+    grad_elements_pick: scipy.sparse.csc_matrix,
+) -> NDArray:
+    return _dmrf_grad(X, Prec, grad_elements_pick)
+
+
+def dmrf_hess(
+    Prec: scipy.sparse.csc_matrix,
+    grad_elements_pick: scipy.sparse.csc_matrix,
+) -> NDArray:
+    return _dmrf_hess(Prec, grad_elements_pick)
+
+
+def dmrfL_grad(
+    X: NDArray,
+    L: scipy.sparse.csc_matrix,
+    grad_elements_pick: scipy.sparse.csc_matrix,
+    perm_indices: NDArray,
+) -> NDArray:
+    return _dmrfL_grad(X, L, grad_elements_pick, perm_indices)
+
+
+def dmrfL_hess(
+    X: NDArray,
+    L: scipy.sparse.csc_matrix,
+    grad_elements_pick: scipy.sparse.csc_matrix,
+    perm_indices: NDArray,
+) -> NDArray:
+    return _dmrfL_hess(X, L, grad_elements_pick, perm_indices)

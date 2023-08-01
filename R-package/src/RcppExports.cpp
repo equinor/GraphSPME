@@ -107,6 +107,133 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// _compute_amd_ordering
+Eigen::Matrix<int,Eigen::Dynamic,1> _compute_amd_ordering(Eigen::SparseMatrix<double>& A);
+RcppExport SEXP _GraphSPME__compute_amd_ordering(SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(_compute_amd_ordering(A));
+    return rcpp_result_gen;
+END_RCPP
+}
+// __cholesky_factor
+Eigen::SparseMatrix<double> __cholesky_factor(Eigen::SparseMatrix<double>& P, Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices);
+RcppExport SEXP _GraphSPME___cholesky_factor(SEXP PSEXP, SEXP perm_indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type P(PSEXP);
+    Rcpp::traits::input_parameter< Eigen::Matrix<int,Eigen::Dynamic,1> >::type perm_indices(perm_indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(__cholesky_factor(P, perm_indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _chol_to_precision
+Eigen::SparseMatrix<double> _chol_to_precision(Eigen::SparseMatrix<double>& L, Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices);
+RcppExport SEXP _GraphSPME__chol_to_precision(SEXP LSEXP, SEXP perm_indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< Eigen::Matrix<int,Eigen::Dynamic,1> >::type perm_indices(perm_indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(_chol_to_precision(L, perm_indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// __dmrf
+double __dmrf(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X, Eigen::SparseMatrix<double>& Prec, Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices);
+RcppExport SEXP _GraphSPME___dmrf(SEXP XSEXP, SEXP PrecSEXP, SEXP perm_indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type Prec(PrecSEXP);
+    Rcpp::traits::input_parameter< Eigen::Matrix<int,Eigen::Dynamic,1> >::type perm_indices(perm_indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(__dmrf(X, Prec, perm_indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// __dmrfL
+double __dmrfL(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X, Eigen::SparseMatrix<double>& L, Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices);
+RcppExport SEXP _GraphSPME___dmrfL(SEXP XSEXP, SEXP LSEXP, SEXP perm_indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< Eigen::Matrix<int,Eigen::Dynamic,1> >::type perm_indices(perm_indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(__dmrfL(X, L, perm_indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _dmrf_grad
+Eigen::Matrix<double,Eigen::Dynamic,1> _dmrf_grad(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X, Eigen::SparseMatrix<double>& Prec, Eigen::SparseMatrix<double>& grad_elements_pick);
+RcppExport SEXP _GraphSPME__dmrf_grad(SEXP XSEXP, SEXP PrecSEXP, SEXP grad_elements_pickSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type Prec(PrecSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type grad_elements_pick(grad_elements_pickSEXP);
+    rcpp_result_gen = Rcpp::wrap(_dmrf_grad(X, Prec, grad_elements_pick));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _dmrf_hess
+Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _dmrf_hess(Eigen::SparseMatrix<double>& Prec, Eigen::SparseMatrix<double>& grad_elements_pick);
+RcppExport SEXP _GraphSPME__dmrf_hess(SEXP PrecSEXP, SEXP grad_elements_pickSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type Prec(PrecSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type grad_elements_pick(grad_elements_pickSEXP);
+    rcpp_result_gen = Rcpp::wrap(_dmrf_hess(Prec, grad_elements_pick));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _dmrfL_grad
+Eigen::Matrix<double,Eigen::Dynamic,1> _dmrfL_grad(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X, Eigen::SparseMatrix<double>& L, Eigen::SparseMatrix<double>& grad_elements_pick, Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices);
+RcppExport SEXP _GraphSPME__dmrfL_grad(SEXP XSEXP, SEXP LSEXP, SEXP grad_elements_pickSEXP, SEXP perm_indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type grad_elements_pick(grad_elements_pickSEXP);
+    Rcpp::traits::input_parameter< Eigen::Matrix<int,Eigen::Dynamic,1> >::type perm_indices(perm_indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(_dmrfL_grad(X, L, grad_elements_pick, perm_indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _dmrfL_hess
+Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> _dmrfL_hess(Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& X, Eigen::SparseMatrix<double>& L, Eigen::SparseMatrix<double>& grad_elements_pick, Eigen::Matrix<int,Eigen::Dynamic,1> perm_indices);
+RcppExport SEXP _GraphSPME__dmrfL_hess(SEXP XSEXP, SEXP LSEXP, SEXP grad_elements_pickSEXP, SEXP perm_indicesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic>& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type grad_elements_pick(grad_elements_pickSEXP);
+    Rcpp::traits::input_parameter< Eigen::Matrix<int,Eigen::Dynamic,1> >::type perm_indices(perm_indicesSEXP);
+    rcpp_result_gen = Rcpp::wrap(_dmrfL_hess(X, L, grad_elements_pick, perm_indices));
+    return rcpp_result_gen;
+END_RCPP
+}
+// _ensure_eigenvalue_lower_bound
+Eigen::SparseMatrix<double> _ensure_eigenvalue_lower_bound(Eigen::SparseMatrix<double>& A, double eps, bool is_symmetric);
+RcppExport SEXP _GraphSPME__ensure_eigenvalue_lower_bound(SEXP ASEXP, SEXP epsSEXP, SEXP is_symmetricSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double>& >::type A(ASEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< bool >::type is_symmetric(is_symmetricSEXP);
+    rcpp_result_gen = Rcpp::wrap(_ensure_eigenvalue_lower_bound(A, eps, is_symmetric));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__cov_shrink_spd", (DL_FUNC) &_GraphSPME__cov_shrink_spd, 1},
@@ -117,6 +244,16 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GraphSPME__get_precision_nonzero", (DL_FUNC) &_GraphSPME__get_precision_nonzero, 2},
     {"_GraphSPME__prec_nll", (DL_FUNC) &_GraphSPME__prec_nll, 2},
     {"_GraphSPME__prec_aic", (DL_FUNC) &_GraphSPME__prec_aic, 2},
+    {"_GraphSPME__compute_amd_ordering", (DL_FUNC) &_GraphSPME__compute_amd_ordering, 1},
+    {"_GraphSPME___cholesky_factor", (DL_FUNC) &_GraphSPME___cholesky_factor, 2},
+    {"_GraphSPME__chol_to_precision", (DL_FUNC) &_GraphSPME__chol_to_precision, 2},
+    {"_GraphSPME___dmrf", (DL_FUNC) &_GraphSPME___dmrf, 3},
+    {"_GraphSPME___dmrfL", (DL_FUNC) &_GraphSPME___dmrfL, 3},
+    {"_GraphSPME__dmrf_grad", (DL_FUNC) &_GraphSPME__dmrf_grad, 3},
+    {"_GraphSPME__dmrf_hess", (DL_FUNC) &_GraphSPME__dmrf_hess, 2},
+    {"_GraphSPME__dmrfL_grad", (DL_FUNC) &_GraphSPME__dmrfL_grad, 4},
+    {"_GraphSPME__dmrfL_hess", (DL_FUNC) &_GraphSPME__dmrfL_hess, 4},
+    {"_GraphSPME__ensure_eigenvalue_lower_bound", (DL_FUNC) &_GraphSPME__ensure_eigenvalue_lower_bound, 3},
     {NULL, NULL, 0}
 };
 
