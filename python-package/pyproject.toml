@@ -11,6 +11,12 @@ dependencies = [
     "pybind11"
 ]
 
+[project.optional-dependencies]
+dev = ["pytest",
+       "black",
+       "flake8"
+       ]
+
 [build-system]
 requires = [
     "setuptools>=42",
