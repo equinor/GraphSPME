@@ -1,7 +1,6 @@
 [project]
 name = "GraphSPME"
 description = "titanic_ml example package"
-version = "0.0.1"
 authors = [
     { name = "Berent Ånund Strømnes Lunde", email = "lundeberent@gmail.com" }
 ]
