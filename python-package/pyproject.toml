@@ -9,7 +9,7 @@ authors = [
 dependencies = [
     "numpy",
     "scipy",
-    "pybind11"
+    "pybind11",
 ]
 
 [project.optional-dependencies]
