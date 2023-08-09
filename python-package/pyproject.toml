@@ -1,6 +1,8 @@
 [project]
 name = "GraphSPME"
 description = "titanic_ml example package"
+# version = "0.0.1"
+dynamic = ["version"]
 authors = [
     { name = "Berent Ånund Strømnes Lunde", email = "lundeberent@gmail.com" }
 ]
@@ -21,7 +23,7 @@ requires = [
     "setuptools>=42",
     "wheel",
     "pybind11>=2.8.0",
-    "setuptools_scm>=6.2",
+    "setuptools_scm[toml]>=6.2",
 ]
 
 build-backend = "setuptools.build_meta"
@@ -33,3 +35,5 @@ before-all = ["git clone https://gitlab.com/libeigen/eigen.git"]
 
 [tool.cibuildwheel.windows]
 test-command = "pytest {project}/python-package/tests"
+
+[tool.setuptools_scm]
