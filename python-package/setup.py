@@ -38,7 +38,7 @@ setup(
     install_requires=["numpy", "scipy"],
     package_dir={"": "src"},
     packages=find_packages(where="src"),
-    extras_require={"test": ["pytest"]},
+    extras_require={"dev": ["pytest", "black", "flake8"]},
     zip_safe=False,
     python_requires=">=3.6",
 )
