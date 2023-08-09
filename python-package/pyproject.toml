@@ -1,6 +1,6 @@
 [project]
 name = "GraphSPME"
-description = "titanic_ml example package"
+description = "High dimensional precision matrix estimation with a known graphical structure"
 # version = "0.0.1"
 dynamic = ["version"]
 authors = [
@@ -37,3 +37,4 @@ before-all = ["git clone https://gitlab.com/libeigen/eigen.git"]
 test-command = "pytest {project}/python-package/tests"
 
 [tool.setuptools_scm]
+root = ".."
