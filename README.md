@@ -157,5 +157,3 @@ of the graphical nature of the problem.
 - Le (2021) introduces a sparse precision matrix estimate from the ml-estimate covariance matrix.
 The method utilizes the knowledge of a graphical structure beneath the realized data.
 - Touloumis (2015) finds asymptotic closed form results for schrinkage of the frequentist covariance estimate.
-  
-
