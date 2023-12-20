@@ -41,5 +41,5 @@ setup(
     packages=find_packages(where="src"),
     extras_require={"test": ["pytest"]},
     zip_safe=False,
-    python_requires=">=3.6",
+    python_requires=">=3.8",
 )
