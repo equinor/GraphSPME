@@ -16,6 +16,7 @@ ext_modules = [
             os.path.join(os.path.dirname(__file__), "../include/graph_spme"),
             "/usr/include/eigen3",
             "/usr/local/include/eigen3",
+            "/usr/local/homebrew/opt/eigen/include/eigen3",
             "../eigen",
         ],
         define_macros=[("VERSION_INFO", __version__)],
