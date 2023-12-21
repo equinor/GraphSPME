@@ -23,9 +23,6 @@ ext_modules = [
     ),
 ]
 
-with open("README.md") as f:
-    long_description = f.read()
-
 setup(
     name="GraphSPME",
     version=__version__,
@@ -33,13 +30,10 @@ setup(
     author_email="lundeberent@gmail.com",
     url="https://github.com/Blunde1/GraphSPME",
     description="High dimensional precision matrix estimation with a known graphical structure",
-    long_description=long_description,
-    long_description_content_type="text/markdown",
     ext_modules=ext_modules,
     install_requires=["numpy", "scipy"],
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     extras_require={"dev": ["pytest", "black", "flake8"]},
     zip_safe=False,
-    python_requires=">=3.8",
 )
