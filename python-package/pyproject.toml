@@ -1,7 +1,7 @@
 [project]
 name = "GraphSPME"
 description = "High dimensional precision matrix estimation with a known graphical structure"
-readme = "../README.md"
+readme = "README.md"
 # version = "0.0.1"
 dynamic = ["version"]
 authors = [
