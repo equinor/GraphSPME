@@ -12,13 +12,16 @@
 
 Available as header-only in C++, as a Python-package, or as an R-package.
 
+
 ## Installation
 
 **Python:**
 
 GraphSPME is available on [PyPI](https://pypi.org/project/GraphSPME/):
 
-`pip install GraphSPME` 
+```text
+pip install GraphSPME
+```
 
 **R:**
 
@@ -30,12 +33,11 @@ Note that GraphSPME relies heavily on [Eigen](http://eigen.tuxfamily.org/index.p
 See [dependencies](#dependencies) for details.
 
 
-
 ## Example code and documentation
 
 See [GraphSPME-examples](GraphSPME-examples) for R and Python example code.
 
-We use the AR1 process as an example, as it has known covariance, precision, and graphical structure.
+We use the [AR1 process](https://en.wikipedia.org/wiki/Autoregressive_model) as an example, as it has known covariance, precision, and graphical structure.
 Simulate a zero-mean AR1 process with a known graphical structure:
 ```r
 library(Matrix)
@@ -114,7 +116,9 @@ frobenius_norm(prec_pop-prec_est)
 # [1] 533
 ```
 
+
 ## Dependencies
+
 GraphSPME is built on the linear algebra library [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). In particular the sparse matrix class in Eigen is extensively utilized to obtain efficient and scalable result.
 For the R-package, [RcppEigen](https://github.com/RcppCore/Rcpp) is employed for both bindings to R and access to Eigen (no manual installation needed).
 Bindings to [Python](https://pybind11.readthedocs.io/) are done via PyBind, and here Eigen must be installed manually beforehand.
@@ -146,16 +150,15 @@ pip install -e ./python-package
 ```
 
 
-
 ## Main idea
 
-GraphSPME combines the inversion scheme in Le (2021) with the regularized 
-covariance estimate of Touloumis (2015) as described in <write paper>.
+GraphSPME combines the inversion scheme in [Le (2021)](https://arxiv.org/abs/2107.06815) with the regularized 
+covariance estimate of [Touloumis (2015)](https://arxiv.org/abs/1410.4726) as described in the paper "[GraphSPME: Markov Precision Matrix Estimation and Asymptotic Stein-Type Shrinkage](https://arxiv.org/abs/2205.07584)."
 The package leverages Eigen to obtain scalable result by numerically taking advantage
 of the graphical nature of the problem.
 
-- Le (2021) introduces a sparse precision matrix estimate from the ml-estimate covariance matrix.
+- The paper "[High-dimensional Precision Matrix Estimation with a Known Graphical Structure](https://arxiv.org/abs/2107.06815)" by Le et al. (2021) introduces a sparse precision matrix estimate from the ml-estimate covariance matrix.
 The method utilizes the knowledge of a graphical structure beneath the realized data.
-- Touloumis (2015) finds asymptotic closed form results for schrinkage of the frequentist covariance estimate.
+- The paper "[Nonparametric Stein-type Shrinkage Covariance Matrix Estimators in High-Dimensional Settings](https://arxiv.org/abs/1410.4726)" by Touloumis (2015) finds asymptotic closed form results for schrinkage of the frequentist covariance estimate.
   
 

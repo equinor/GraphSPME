@@ -16,6 +16,7 @@ ext_modules = [
             os.path.join(os.path.dirname(__file__), "../include/graph_spme"),
             "/usr/include/eigen3",
             "/usr/local/include/eigen3",
+            "/usr/local/homebrew/opt/eigen/include/eigen3",
             "../eigen",
         ],
         define_macros=[("VERSION_INFO", __version__)],
@@ -40,5 +41,5 @@ setup(
     packages=find_packages(where="src"),
     extras_require={"dev": ["pytest", "black", "flake8"]},
     zip_safe=False,
-    python_requires=">=3.6",
+    python_requires=">=3.8",
 )
