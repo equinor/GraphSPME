@@ -1,6 +1,7 @@
 [project]
 name = "GraphSPME"
 description = "High dimensional precision matrix estimation with a known graphical structure"
+readme = "../README.md"
 # version = "0.0.1"
 dynamic = ["version"]
 authors = [
@@ -11,6 +12,7 @@ dependencies = [
     "scipy",
     "pybind11",
 ]
+requires-python=">=3.8"
 
 [project.optional-dependencies]
 dev = ["pytest",
