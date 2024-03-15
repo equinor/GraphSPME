@@ -1,6 +1,6 @@
 # Contributing
 
-The following is a set of guidelines for contributing to ERT.
+The following is a set of guidelines for contributing to GraphSPME.
 
 ## Ground Rules
 
