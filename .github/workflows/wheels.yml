@@ -50,6 +50,7 @@ jobs:
         package-dir: python-package
       env:
         CIBW_ARCHS_MACOS: auto universal2
+        CIBW_ARCHS: auto64
         CIBW_TEST_EXTRAS: "dev"
 
     - name: Verify clean directory
