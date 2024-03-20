@@ -18,18 +18,21 @@ jobs:
       run:
         working-directory: ./python-package
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Build SDist
       run: pipx run build --sdist
 
     - name: Check metadata
-      run: pipx run twine check dist/*
+      run: |
+         pipx run twine check dist/*
+         pwd
+         ls -lah dist
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
-        path: dist/*.tar.gz
-
+        name: sdist-artifact
+        path: ${{ github.workspace }}/python-package/dist/*.tar.gz
 
   build_wheels:
     name: Wheels on ${{ matrix.os }}
@@ -43,13 +46,14 @@ jobs:
         working-directory: ./python-package
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - uses: pypa/cibuildwheel@v2.3.1
+    - uses: pypa/cibuildwheel@v2.17.0
       with:
         package-dir: python-package
       env:
         CIBW_ARCHS_MACOS: auto universal2
+        CIBW_ARCHS: auto64
         CIBW_TEST_EXTRAS: "dev"
 
     - name: Verify clean directory
@@ -57,10 +61,11 @@ jobs:
       shell: bash
 
     - name: Upload wheels
-      uses: actions/upload-artifact@v2
-      with:
-        path: wheelhouse/*.whl
+      uses: actions/upload-artifact@v4
 
+      with:
+        name: wheel-artifacts-${{ matrix.os }}
+        path: wheelhouse/*.whl
 
   upload:
     name: Upload
@@ -69,14 +74,14 @@ jobs:
     if: github.event_name == 'release' && github.event.action == 'published'
 
     steps:
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
-        name: artifact
+        name: wheel-artifacts*
         path: dist
 
-    - uses: pypa/gh-action-pypi-publish@v1.4.2
+    - uses: pypa/gh-action-pypi-publish@v1.8.14
       with:
         user: __token__
         password: ${{ secrets.pypi_password }}
