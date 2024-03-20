@@ -24,12 +24,15 @@ jobs:
       run: pipx run build --sdist
 
     - name: Check metadata
-      run: pipx run twine check dist/*
+      run: |
+         pipx run twine check dist/*
+         pwd
+         ls -lah dist
 
     - uses: actions/upload-artifact@v4
       with:
-        path: dist/*.tar.gz
-
+        name: sdist-artifact
+        path: ${{ github.workspace }}/python-package/dist/*.tar.gz
 
   build_wheels:
     name: Wheels on ${{ matrix.os }}
@@ -59,9 +62,10 @@ jobs:
 
     - name: Upload wheels
       uses: actions/upload-artifact@v4
-      with:
-        path: wheelhouse/*.whl
 
+      with:
+        name: wheel-artifacts-${{ matrix.os }}
+        path: wheelhouse/*.whl
 
   upload:
     name: Upload
@@ -74,7 +78,7 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-        name: artifact
+        name: wheel-artifacts*
         path: dist
 
     - uses: pypa/gh-action-pypi-publish@v1.8.14
