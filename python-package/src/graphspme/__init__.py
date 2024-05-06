@@ -98,11 +98,15 @@ def chol_to_precision(
     return _chol_to_precision(L, perm_indices)
 
 
-def dmrf(X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray) -> float:
+def dmrf(
+    X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray
+) -> float:
     return _dmrf(X, Prec, perm_indices)
 
 
-def dmrfL(X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray) -> float:
+def dmrfL(
+    X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray
+) -> float:
     return _dmrfL(X, Prec, perm_indices)
 
 
