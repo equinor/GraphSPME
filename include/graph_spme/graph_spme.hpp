@@ -1,8 +1,6 @@
 // Main functions for GraphSPME
 // License: GPL-3
 
-#include <iostream> // This is the line you need to add
-
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -190,10 +188,8 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(
     lambda_hat = std::max(0.0, std::min(lambda_hat, 1.0));
 
 
-    //Dmat target_diagonal = S.diagonal();
     S *= (1.0 - lambda_hat);
     S.diagonal() += lambda_hat * target_diagonal;
-    //S.diagonal() += Eigen::VectorXd::Ones(p) * (lambda_hat * nu);
 
     // Inflate as a factor multiplied with BIC
     // BIC should give the order of sampling error
