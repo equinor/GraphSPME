@@ -2,6 +2,7 @@
 // License: GPL-3
 
 
+#include <iostream>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
