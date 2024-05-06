@@ -259,7 +259,8 @@ Eigen::SparseMatrix<double> prec_sparse(
         {
             cov_ml_est = cov_ml(xbi);
         }
-        auto wi1 = cov_ml_est.inverse() * (Bi_trans * Ip.col(j));
+        auto wi1 = cov_ml_est.llt().solve((Bi.transpose() * Ip.col(j)).toDense().eval());
+        //auto wi1 = cov_ml_est.inverse() * (Bi_trans * Ip.col(j));        
         for (int k = 0; k < Bi.outerSize(); ++k)
         {
             for (SpdMat::InnerIterator it(Bi, k); it; ++it)
