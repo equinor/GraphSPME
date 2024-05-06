@@ -1,5 +1,8 @@
 // Main functions for GraphSPME
 // License: GPL-3
+
+
+#include <stdexcept>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
@@ -94,7 +97,10 @@ Dmat cov_ml(Dmat &X)
  * Covariance shrinkage estimate as specified in Touloumis (2015)
  */
 Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> &X)
+    Eigen::Matrix<double,Eigen::Dynamic, Eigen::Dynamic> &X, 
+    int shrinkage_target=0,
+    double inflation_factor=1.0
+    )
 {
     int n = X.rows();
     int p = X.cols();
@@ -139,6 +145,8 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(
     Y_8N = Y_8N / (n * (n - 1) * (n - 2) * (n - 3));
     double T_3N = Y_3N - 2 * Y_7N + Y_8N;
 
+  
+
     // Calculate shrinkage factor
     // Target is diag(S)
     // Avoid target selection as recommended in paper
@@ -146,11 +154,47 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(
     double lambda_hat_D = (T_2N + T_1N * T_1N - 2.0 * T_3N) / (n * T_2N + T_1N * T_1N - (n + 1) * T_3N);
     lambda_hat_D = std::max(0.0, std::min(lambda_hat_D, 1.0));
 
-    // Modify covariance estimate
-    double lambda_hat = lambda_hat_D;
-    Dmat target_diagonal = S.diagonal();
+    double lambda_hat;
+    Dmat target_diagonal = Eigen::VectorXd::Ones(p);
+    switch(shrinkage_target){
+        case 0: {
+            // common variance
+            double nu = trS/ p;
+            lambda_hat = (T_2N + T_1N*T_1N) / (
+                n*T_2N + (p-n+1.0)/p * T_1N*T_1N
+            );
+            target_diagonal *= nu;
+            break;
+        }
+        case 1: {
+            // Identity
+            lambda_hat = (T_2N + T_1N*T_1N) / (
+                n*T_2N + T_1N*T_1N - (n-1)*(2.0 * T_1N - p)
+                );
+                // Target diagonal remains unit vector
+            break;
+        }
+        case 2: {
+            // Sample diagonal (variances)
+            lambda_hat = (T_2N + T_1N * T_1N - 2.0 * T_3N) / (
+                n * T_2N + T_1N * T_1N - (n + 1) * T_3N
+                );
+            target_diagonal = S.diagonal();
+            break;
+        }
+        default:
+            throw std::invalid_argument("Error: Shrinkage target is not 0, 1, or 2.");
+    }
+    lambda_hat = std::max(0.0, std::min(lambda_hat, 1.0));
+
+
     S *= (1.0 - lambda_hat);
     S.diagonal() += lambda_hat * target_diagonal;
+
+    // Inflate as a factor multiplied with BIC
+    // BIC should give the order of sampling error
+    S.diagonal() *= (1.0 + inflation_factor * 0.5 * p*std::log(p)/n);
+
     return S;
 }
 
@@ -188,8 +232,10 @@ Eigen::SparseMatrix<double> prec_sparse(
     Eigen::SparseMatrix<double> &Graph,
     int markov_order = 1,
     bool cov_shrinkage = true,
-    bool symmetrization = true)
-{
+    bool symmetrization = true,
+    int shrinkage_target=2,
+    double inflation_factor=1.0
+){
     int p = X.cols();
     int values_set = 0;
     int si;
@@ -207,7 +253,7 @@ Eigen::SparseMatrix<double> prec_sparse(
         Dmat cov_ml_est(si, si);
         if (cov_shrinkage)
         {
-            cov_ml_est = cov_shrink_spd(xbi);
+            cov_ml_est = cov_shrink_spd(xbi, shrinkage_target, inflation_factor);
         }
         else
         {
