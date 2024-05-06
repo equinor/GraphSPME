@@ -183,7 +183,7 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(
             break;
         }
         default:
-            throw std:invalid_argument("Error: Shrinkage target is not 0, 1, or 2.");
+            throw std::invalid_argument("Error: Shrinkage target is not 0, 1, or 2.");
     }
     lambda_hat = std::max(0.0, std::min(lambda_hat, 1.0));
 
