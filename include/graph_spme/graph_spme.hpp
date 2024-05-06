@@ -2,7 +2,7 @@
 // License: GPL-3
 
 
-#include <iostream>
+#include <stdexcept>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
@@ -183,8 +183,7 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(
             break;
         }
         default:
-            std::cerr << "Error: Shrinkage target is not 0, 1, or 2." << std::endl;
-            break;
+            throw std:invalid_argument("Error: Shrinkage target is not 0, 1, or 2.");
     }
     lambda_hat = std::max(0.0, std::min(lambda_hat, 1.0));
 
