@@ -36,7 +36,7 @@ def prec_sparse(
     cov_shrinkage: bool = True,
     symmetrization: bool = True,
     shrinkage_target: int = 2,
-    inflation_factor: float=1.0
+    inflation_factor: float = 1.0
 ) -> scipy.sparse.csc_matrix:
     if not scipy.sparse.isspmatrix_csc(Graph):
         raise ValueError(
