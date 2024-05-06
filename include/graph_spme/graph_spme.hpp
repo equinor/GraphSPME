@@ -236,20 +236,47 @@ Eigen::SparseMatrix<double> prec_sparse(
     int shrinkage_target=2,
     double inflation_factor=1.0
 ){
+    int n = X.rows();
     int p = X.cols();
     int values_set = 0;
     int si;
-    SpdMat Ip(p, p), Prec(p, p);
-    Ip.setIdentity();
+    SpdMat Prec(p, p); //, Ip(p, p);
+    //Ip.setIdentity();
     Prec.setZero();
     Eigen::SparseMatrix<double> Z = get_precision_nonzero(Graph, markov_order);
     std::vector<dTriplet> prec_mat_triplet(Z.nonZeros());
     for (int j = 0; j < p; j++)
     {
-        SpdMat Bi = create_bi(Z, j);
-        SpdMat Bi_trans = Bi.transpose();
-        si = Bi.cols();
-        Dmat xbi = X * Bi;
+        
+        // possible to avoid create_bi
+        // create i vectors of neighbors from Z.col(j) nonzeros
+        // subset xbi as x_sub_j. Check eigen indexing based on neighbors and j
+        // build cov_ml_est based on this
+        // create wi1 as I do now
+        // iterate over neighbors and j to set prec_mat_triplet
+        std::vector<int> row_indices_at_j;
+        for (Eigen::SparseMatrix<double>::InnerIterator it(Z, j); it; ++it) {
+            row_indices_at_j.push_back(it.row());
+        }
+
+        int si = row_indices_at_j.size();
+        Dvec j_vector = Dvec(si); // where to pick out element j from si nonzeroes
+        j_vector.setZero();
+        Dmat xbi(n, si);
+        for (size_t k = 0; k < si; ++k) {
+            xbi.col(k) = X.col(row_indices_at_j[k]);
+            if(row_indices_at_j[k] == j){
+                j_vector[k] = 1.0;
+            }
+        }
+
+
+
+
+        //SpdMat Bi = create_bi(Z, j);
+        //SpdMat Bi_trans = Bi.transpose();
+        //si = Bi.cols();
+        //Dmat xbi = X * Bi;
         Dmat cov_ml_est(si, si);
         if (cov_shrinkage)
         {
@@ -259,16 +286,27 @@ Eigen::SparseMatrix<double> prec_sparse(
         {
             cov_ml_est = cov_ml(xbi);
         }
-        auto wi1 = cov_ml_est.llt().solve((Bi.transpose() * Ip.col(j)).toDense().eval());
-        //auto wi1 = cov_ml_est.inverse() * (Bi_trans * Ip.col(j));        
-        for (int k = 0; k < Bi.outerSize(); ++k)
-        {
-            for (SpdMat::InnerIterator it(Bi, k); it; ++it)
-            {
-                prec_mat_triplet[values_set] = dTriplet(it.row(), j, wi1[it.col()]);
-                values_set++;
-            }
+        // Bi.row(j).toDense(): this is just zeroes everywhere, except where to pick out j from the si non-zero elements
+        Dvec wi1 = cov_ml_est.llt().solve(j_vector);
+        //Dvec wi1 = cov_ml_est.llt().solve(Bi.row(j).toDense());
+        //auto wi1 = cov_ml_est.llt().solve((Bi.transpose() * Ip.col(j)).toDense().eval());
+        //auto wi1 = cov_ml_est.inverse() * (Bi_trans * Ip.col(j));
+        for (int k=0; k<si; ++k){
+            prec_mat_triplet[values_set] = dTriplet(
+                row_indices_at_j[k], j, wi1[k]
+                );
+            values_set++;
         }
+
+
+        // for (int k = 0; k < Bi.outerSize(); ++k)
+        // {
+        //     for (SpdMat::InnerIterator it(Bi, k); it; ++it)
+        //     {
+        //         prec_mat_triplet[values_set] = dTriplet(it.row(), j, wi1[it.col()]);
+        //         values_set++;
+        //     }
+        // }
     }
     Prec.setFromTriplets(prec_mat_triplet.begin(), prec_mat_triplet.end());
     if (symmetrization)
