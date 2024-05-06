@@ -36,7 +36,7 @@ def prec_sparse(
     cov_shrinkage: bool = True,
     symmetrization: bool = True,
     shrinkage_target: int = 2,
-    inflation_factor: float = 1.0
+    inflation_factor: float = 1.0,
 ) -> scipy.sparse.csc_matrix:
     if not scipy.sparse.isspmatrix_csc(Graph):
         raise ValueError(
@@ -66,7 +66,7 @@ def prec_sparse(
         cov_shrinkage,
         symmetrization,
         shrinkage_target,
-        inflation_factor
+        inflation_factor,
     )
 
 
@@ -98,15 +98,11 @@ def chol_to_precision(
     return _chol_to_precision(L, perm_indices)
 
 
-def dmrf(
-    X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray
-) -> float:
+def dmrf(X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray) -> float:
     return _dmrf(X, Prec, perm_indices)
 
 
-def dmrfL(
-    X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray
-) -> float:
+def dmrfL(X: NDArray, Prec: scipy.sparse.csc_matrix, perm_indices: NDArray) -> float:
     return _dmrfL(X, Prec, perm_indices)
 
 
