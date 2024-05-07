@@ -52,37 +52,6 @@ Eigen::SparseMatrix<double> get_precision_nonzero(
 }
 
 /*
- * Returns matrix Bi so that Bi*wi1 = wi,
- * wi: column i of precision matrix
- * wi1: non-zero elements of wi
- * Z: sparse positional matrix of non-zero elements of precision
- * j: column
- */
-Eigen::SparseMatrix<double> create_bi(
-    Eigen::SparseMatrix<double> &Z,
-    int j)
-{
-    int p = Z.cols();
-    // Iterate to find non-zero elements of Z[,i]
-    int si = 0;
-    std::vector<int> row_values;
-    for (SpdMat::InnerIterator it(Z, j); it; ++it)
-    {
-        si += it.value();
-        row_values.push_back(it.row());
-    }
-    // Use triplets to initialize block I_si at start
-    std::vector<dTriplet> sparse_mat_triplet(si);
-    for (int i = 0; i < si; i++)
-    {
-        sparse_mat_triplet[i] = dTriplet(row_values[i], i, 1.0);
-    }
-    SpdMat Bi(p, si);
-    Bi.setFromTriplets(sparse_mat_triplet.begin(), sparse_mat_triplet.end());
-    return Bi;
-}
-
-/*
  * The maximum likelihood covariance estimate
  */
 Dmat cov_ml(Dmat &X)
@@ -145,8 +114,6 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(
     Y_8N = Y_8N / (n * (n - 1) * (n - 2) * (n - 3));
     double T_3N = Y_3N - 2 * Y_7N + Y_8N;
 
-  
-
     // Calculate shrinkage factor
     // Target is diag(S)
     // Avoid target selection as recommended in paper
@@ -186,7 +153,6 @@ Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> cov_shrink_spd(
             throw std::invalid_argument("Error: Shrinkage target is not 0, 1, or 2.");
     }
     lambda_hat = std::max(0.0, std::min(lambda_hat, 1.0));
-
 
     S *= (1.0 - lambda_hat);
     S.diagonal() += lambda_hat * target_diagonal;
@@ -240,28 +206,28 @@ Eigen::SparseMatrix<double> prec_sparse(
     int p = X.cols();
     int values_set = 0;
     int si;
-    SpdMat Prec(p, p); //, Ip(p, p);
-    //Ip.setIdentity();
+    SpdMat Prec(p, p);
     Prec.setZero();
     Eigen::SparseMatrix<double> Z = get_precision_nonzero(Graph, markov_order);
     std::vector<dTriplet> prec_mat_triplet(Z.nonZeros());
     for (int j = 0; j < p; j++)
     {
-        
-        // possible to avoid create_bi
-        // create i vectors of neighbors from Z.col(j) nonzeros
-        // subset xbi as x_sub_j. Check eigen indexing based on neighbors and j
-        // build cov_ml_est based on this
-        // create wi1 as I do now
-        // iterate over neighbors and j to set prec_mat_triplet
+        // Implementation diverges from paper by not implementing Bi matrix
+        // Bi picks out the non-zero elements from data or precision.
+        // Instead of Bi we use indexing and slicing directly.
         std::vector<int> row_indices_at_j;
         for (Eigen::SparseMatrix<double>::InnerIterator it(Z, j); it; ++it) {
             row_indices_at_j.push_back(it.row());
         }
 
+        // The number of non-zero entries
         int si = row_indices_at_j.size();
-        Dvec j_vector = Dvec(si); // where to pick out element j from si nonzeroes
+        // Where to pick out element j from si nonzeroes
+        
+        Dvec j_vector = Dvec(si);
         j_vector.setZero();
+
+        // Paper equivalent with Bi: Dmat xbi = X * Bi;
         Dmat xbi(n, si);
         for (size_t k = 0; k < si; ++k) {
             xbi.col(k) = X.col(row_indices_at_j[k]);
@@ -270,13 +236,6 @@ Eigen::SparseMatrix<double> prec_sparse(
             }
         }
 
-
-
-
-        //SpdMat Bi = create_bi(Z, j);
-        //SpdMat Bi_trans = Bi.transpose();
-        //si = Bi.cols();
-        //Dmat xbi = X * Bi;
         Dmat cov_ml_est(si, si);
         if (cov_shrinkage)
         {
@@ -286,27 +245,18 @@ Eigen::SparseMatrix<double> prec_sparse(
         {
             cov_ml_est = cov_ml(xbi);
         }
-        // Bi.row(j).toDense(): this is just zeroes everywhere, except where to pick out j from the si non-zero elements
+
+        // Paper equivalent is
+        // auto wi1 = cov_ml_est.inverse() * (Bi_transpose * Ip.col(j));
         Dvec wi1 = cov_ml_est.llt().solve(j_vector);
-        //Dvec wi1 = cov_ml_est.llt().solve(Bi.row(j).toDense());
-        //auto wi1 = cov_ml_est.llt().solve((Bi.transpose() * Ip.col(j)).toDense().eval());
-        //auto wi1 = cov_ml_est.inverse() * (Bi_trans * Ip.col(j));
+
+        // Store precision col j elements into the list of triplets
         for (int k=0; k<si; ++k){
             prec_mat_triplet[values_set] = dTriplet(
                 row_indices_at_j[k], j, wi1[k]
                 );
             values_set++;
         }
-
-
-        // for (int k = 0; k < Bi.outerSize(); ++k)
-        // {
-        //     for (SpdMat::InnerIterator it(Bi, k); it; ++it)
-        //     {
-        //         prec_mat_triplet[values_set] = dTriplet(it.row(), j, wi1[it.col()]);
-        //         values_set++;
-        //     }
-        // }
     }
     Prec.setFromTriplets(prec_mat_triplet.begin(), prec_mat_triplet.end());
     if (symmetrization)
