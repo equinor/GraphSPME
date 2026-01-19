@@ -32,7 +32,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]
 test-command = "cd {project}/python-package && pytest tests"
-test-skip = "*universal2:arm64 cp310-manylinux_i686 cp310-win32"
+test-skip = "*universal2:arm64"
 before-all = ["git clone https://gitlab.com/libeigen/eigen.git"]
 skip = ["cp38-*", "cp39-*", "*musllinux*"]
 
