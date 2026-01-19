@@ -48,7 +48,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: pypa/cibuildwheel@v2.17.0
+    - uses: pypa/cibuildwheel@298ed2fb2c105540f5ed055e8a6ad78d82dd3a7e # v3.3.1
       with:
         package-dir: python-package
       env:
