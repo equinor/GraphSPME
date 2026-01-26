@@ -20,7 +20,6 @@ from _graphspme import (
     _dmrfL_hess,
 )
 
-
 if sys.version_info >= (3, 7):
     import numpy.typing
 
